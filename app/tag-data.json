@@ -1,11 +1,11 @@
 {
-	"leetcode": 2,
+	"leetcode": 3,
 	"github": 1,
 	"guide": 2,
 	"recursion": 1,
 	"iteration": 1,
-	"linked-lists": 1,
-	"space-complexity": 1,
+	"linked-lists": 2,
+	"complexity": 1,
 	"unity engine": 2,
 	"game development": 2,
 	"dynamic-programming": 1
