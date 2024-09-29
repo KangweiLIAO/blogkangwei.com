@@ -3,10 +3,10 @@ title: LeetCode 1130 - Minimum Cost Tree From Leaf Values
 date: '2024-08-27'
 tags: ['leetcode', 'dynamic programming']
 draft: false
-summary: A breakdown of solving the coding problem 1130 - using dynamic programming and greedy techniques.
+summary: My solution to the LeetCode problem 1130 - using dynamic programming and greedy techniques.
 ---
 
-In this post, we will explore how to solve the coding problem 1130 - Minimum Cost Tree From Leaf Values. This problem touches on topics like Dynamic Programming (DP), Greedy algorithms, and Mono Structures. Below is an approach and solution to tackle the problem efficiently.
+My solution to the LeetCode problem 1130 - Minimum Cost Tree From Leaf Values. This problem touches on topics like Dynamic Programming (DP), Greedy algorithms, and Mono Structures. Below is an approach and solution to tackle the problem efficiently.
 
 ---
 
@@ -26,36 +26,31 @@ The problem requires us to construct a binary tree where each leaf node has a va
 1. **Greedy Technique**: At each step, remove the smallest leaf to minimize the immediate cost.
 2. **Mono Struct**: A structure that maintains the values in a particular order to help optimize our approach.
 
-The following solution provided by Kangwei illustrates the greedy technique to solve this problem efficiently.
+The following solution provided by me illustrates the greedy technique to solve this problem.
 
 ```cpp
 class Solution {
 public:
     int mctFromLeafValues(vector<int>& arr) {
         int result = 0;
-        while (arr.size() > 1) {
-            int minIndex = 0;
-            for (int i = 1; i < arr.size(); ++i) {
-                if (arr[i] < arr[minIndex]) {
-                    minIndex = i;
-                }
+        stack<int> s;
+        s.push(INT_MAX);  // add a large value to compare
+        
+        for (int value : arr) {
+            while (s.top() <= value) {
+                int mid = s.top();
+                s.pop();
+                result += mid * min(s.top(), value);  // multiply by the smaller of the two neighbors
             }
-            
-            vector<int> vec1;
-            if (minIndex == 0)
-                vec1 = vector<int>();
-            else 
-                vec1 = vector<int>(arr.begin() + (minIndex - 1), arr.begin() + minIndex);
-                
-            vector<int> vec2;
-            if (minIndex + 3 > arr.size())
-                vec2 = vector<int>(arr.begin() + (minIndex + 1), arr.end());
-            else
-                vec2 = vector<int>(arr.begin() + (minIndex + 1), arr.end());
-            
-            result += vec1[0] * vec2[0];
-            arr.erase(arr.begin() + minIndex);
+            s.push(value);
         }
+        
+        while (s.size() > 2) {  // clean up the remaining elements in the stack
+            int mid = s.top();
+            s.pop();
+            result += mid * s.top();
+        }
+        
         return result;
     }
 };
@@ -68,6 +63,7 @@ public:
 3. **Combine Adjacent Elements**: Calculate the cost by multiplying the smallest element with its adjacent element.
 4. **Remove the Smallest Element**: After combining, remove the smallest element from the array to reduce the size, and repeat the process.
 5. **Return the Result**: Once only one element remains, return the accumulated result.
+6. **Time complexity**: The time complexity is O(n) because each element is pushed and popped from the stack at most once.
 
 ---
 
@@ -76,4 +72,3 @@ public:
 This approach demonstrates how a greedy algorithm can efficiently solve a problem like the **Minimum Cost Tree from Leaf Values**. By iteratively removing the smallest element and combining it with its neighbor, we are able to minimize the overall cost of building the binary tree. Mono structures help maintain order in such problems to optimize the approach further.
 
 If you're interested in further optimizing or exploring dynamic programming alternatives, feel free to dive deeper into variations of this problem!
-

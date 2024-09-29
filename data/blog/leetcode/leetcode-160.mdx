@@ -1,16 +1,16 @@
 ---
 title: LeetCode 160 - Intersection of Two Linked-List
 date: '2024-07-15'
-tags: ['leetcode', 'recursion', 'iteration', 'linked lists', 'space complexity']
+tags: ['leetcode', 'recursion', 'iteration', 'linked lists', 'complexity']
 draft: false
-summary: A discussion on choosing between recursion and iteration with linked list problems.
+summary: My solution to the LeetCode problem 160 and a discussion on choosing between recursion and iteration with linked list problems.
 ---
 
-In this post, I want to dive deep into the decision-making process behind choosing between recursion and iteration, using a linked list problem as an example. The problem here is to find the intersection node of two singly linked lists. Let’s first review two solutions—one using recursion and the other using iteration.
+I want to dive into choosing between recursion and iteration. The problem here is to find the intersection node of two singly linked lists. Let’s first review two solutions—one using recursion and the other using iteration.
 
 ## Problem Definition
 
-We are given two singly-linked lists, and we need to determine if they intersect at some node. If they do, we return that node; otherwise, we return `None`.
+We are given two singly-linked lists, and need to determine if they intersect at some node. If they do, we return that node; otherwise, we return `None`.
 
 ```python
 # Definition for singly-linked list.
@@ -41,7 +41,7 @@ class Solution1:
             elif lenB > lenA:
                 return helper(headA, headB.next, lenA, lenB - 1)
             
-            # both lists are aligned in length
+            # both lists are aligned in length from now on:
             if not headA or not headB:
                 return None
             
@@ -90,6 +90,32 @@ class Solution2:
             return helper(ptrA, ptrB)
 
         return helper(headA, headB)  # start recursion
+```
+
+## Solution 3: Iterative Approach
+
+The key idea is to swap the pointers to the head of the other list once they reach the end of their own list. 
+This way, both pointers traverse the same total number of nodes by the time they reach the intersection (or both hit None if 
+there is no intersection).
+
+```python
+class Solution:
+    def getIntersectionNode(self, headA: ListNode, headB: ListNode) -> ListNode:
+        if not headA or not headB:
+            return None
+        
+        # initialize two pointers
+        pA, pB = headA, headB
+        
+        # traverse the two lists
+        while pA != pB:
+            # Move pointer A to headB when it reaches the end of list A, otherwise move to next node
+            pA = pA.next if pA else headB
+            # Move pointer B to headA when it reaches the end of list B, otherwise move to next node
+            pB = pB.next if pB else headA
+        
+        # either both are None or both will be at the intersection node
+        return pA
 ```
 
 ## Iteration vs Recursion
