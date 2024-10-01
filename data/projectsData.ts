@@ -13,6 +13,13 @@ const projectsData: Project[] = [
     imgSrc: '/static/images/scode.png',
     href: 'https://scode-chatbot.vercel.app/',
   },
+  {
+    title: 'Flow Dataset',
+    description: `The Flow Dataset project leveraging the Kubric framework, this project improves how dynamic, multi-object 
+    scenes are generated for optical flow algorithms, making significant advancements in simulating complex, realistic environments.`,
+    imgSrc: '/static/images/banner.png',
+    href: '/blog/flow-dataset',
+  },
 ]
 
 export default projectsData
