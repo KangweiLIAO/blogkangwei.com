@@ -1,6 +1,6 @@
+import dynamic from 'next/dynamic'
 import siteMetadata from '@/data/siteMetadata'
 import headerNavLinks from '@/data/headerNavLinks'
-import Logo from '@/data/logo.svg'
 import Link from './Link'
 import MobileNav from './MobileNav'
 import ThemeSwitch from './ThemeSwitch'
@@ -11,6 +11,8 @@ const Header = () => {
   if (siteMetadata.stickyNav) {
     headerClass += ' sticky top-0 z-50'
   }
+
+  const Logo = dynamic(() => import('./ThemeLogo'), { ssr: false })
 
   return (
     <header className={headerClass}>
