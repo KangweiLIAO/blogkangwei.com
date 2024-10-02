@@ -26,7 +26,12 @@ module.exports = {
       },
       colors: {
         primary: colors.orange,
-        gray: colors.neutral,
+        gray: colors.gray,
+      },
+      zIndex: {
+        60: '60',
+        70: '70',
+        80: '80',
       },
       typography: ({ theme }) => ({
         DEFAULT: {

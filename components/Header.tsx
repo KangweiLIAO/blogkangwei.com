@@ -1,49 +1,47 @@
-'use client'
-
-import { useTheme } from 'next-themes'
 import siteMetadata from '@/data/siteMetadata'
 import headerNavLinks from '@/data/headerNavLinks'
-import LightLogo from '@/data/logo.svg'
-import DarkLogo from '@/data/logo-dark.svg'
+import Logo from '@/data/logo.svg'
 import Link from './Link'
 import MobileNav from './MobileNav'
 import ThemeSwitch from './ThemeSwitch'
 import SearchButton from './SearchButton'
 
 const Header = () => {
-  const { theme } = useTheme()
+  let headerClass = 'flex items-center w-full bg-white dark:bg-gray-950 justify-between py-10'
+  if (siteMetadata.stickyNav) {
+    headerClass += ' sticky top-0 z-50'
+  }
 
   return (
-    <header className="flex items-center justify-between py-10">
-      <div>
-        <Link href="/" aria-label={siteMetadata.headerTitle}>
-          <div className="flex items-center justify-between">
-            <div className="mr-3">
-              {theme === 'dark' ? <LightLogo /> : <DarkLogo />}
-            </div>
-            {typeof siteMetadata.headerTitle === 'string' ? (
-              <div className="hidden h-6 text-2xl font-semibold sm:block">
-                {siteMetadata.headerTitle}
-              </div>
-            ) : (
-              siteMetadata.headerTitle
-            )}
+    <header className={headerClass}>
+      <Link href="/" aria-label={siteMetadata.headerTitle}>
+        <div className="flex items-center justify-between">
+          <div className="mr-3">
+            <Logo />
           </div>
-        </Link>
-      </div>
-      <div className="flex items-center space-x-4 leading-5 sm:space-x-3">
-        {headerNavLinks
-          .filter((link) => link.href !== '/')
-          .map((link) => (
-            <Link
-              key={link.title}
-              href={link.href}
-              className="hidden font-medium text-white dark:text-gray-100 sm:block hover:bg-blue-950 
-              transform transition-transform hover:scale-105 hover:shadow-lg px-4 py-2 rounded"
-            >
-              {link.title}
-            </Link>
-          ))}
+          {typeof siteMetadata.headerTitle === 'string' ? (
+            <div className="hidden h-6 text-2xl font-semibold sm:block">
+              {siteMetadata.headerTitle}
+            </div>
+          ) : (
+            siteMetadata.headerTitle
+          )}
+        </div>
+      </Link>
+      <div className="flex items-center space-x-4 leading-5 sm:space-x-6">
+        <div className="no-scrollbar hidden max-w-40 items-center space-x-4 overflow-x-auto sm:flex sm:space-x-6 md:max-w-72 lg:max-w-96">
+          {headerNavLinks
+            .filter((link) => link.href !== '/')
+            .map((link) => (
+              <Link
+                key={link.title}
+                href={link.href}
+                className="block font-medium text-gray-900 hover:text-primary-500 dark:text-gray-100 dark:hover:text-primary-400"
+              >
+                {link.title}
+              </Link>
+            ))}
+        </div>
         <SearchButton />
         <ThemeSwitch />
         <MobileNav />
