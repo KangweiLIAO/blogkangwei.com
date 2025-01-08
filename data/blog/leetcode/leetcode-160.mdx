@@ -40,11 +40,11 @@ class Solution1:
                 return helper(headA.next, headB, lenA - 1, lenB)
             elif lenB > lenA:
                 return helper(headA, headB.next, lenA, lenB - 1)
-            
+
             # both lists are aligned in length from now on:
             if not headA or not headB:
                 return None
-            
+
             if headA is headB:
                 return headA
 
@@ -94,8 +94,8 @@ class Solution2:
 
 ## Solution 3: Iterative Approach
 
-The key idea is to swap the pointers to the head of the other list once they reach the end of their own list. 
-This way, both pointers traverse the same total number of nodes by the time they reach the intersection (or both hit None if 
+The key idea is to swap the pointers to the head of the other list once they reach the end of their own list.
+This way, both pointers traverse the same total number of nodes by the time they reach the intersection (or both hit None if
 there is no intersection).
 
 ```python
@@ -103,17 +103,17 @@ class Solution:
     def getIntersectionNode(self, headA: ListNode, headB: ListNode) -> ListNode:
         if not headA or not headB:
             return None
-        
+
         # initialize two pointers
         pA, pB = headA, headB
-        
+
         # traverse the two lists
         while pA != pB:
             # Move pointer A to headB when it reaches the end of list A, otherwise move to next node
             pA = pA.next if pA else headB
             # Move pointer B to headA when it reaches the end of list B, otherwise move to next node
             pB = pB.next if pB else headA
-        
+
         # either both are None or both will be at the intersection node
         return pA
 ```
@@ -125,11 +125,10 @@ Let’s now examine why iteration would be more efficient for this type of probl
 ### Factors to Consider:
 
 1. **Input Length and Call Stack Size:**
-   - In recursive solutions, each recursive call adds a new frame to the call stack, which can result in high memory consumption, especially with long linked lists. 
+   - In recursive solutions, each recursive call adds a new frame to the call stack, which can result in high memory consumption, especially with long linked lists.
    - For very large lists, the call stack could overflow due to the deep recursion required to traverse these lists.
-   
 2. **Space Complexity:**
-   - The space complexity for recursion is higher due to the memory used by the call stack. 
+   - The space complexity for recursion is higher due to the memory used by the call stack.
    - The recursive approach requires O(n+m) space, where `n` and `m` are the lengths of the two lists. Each recursive call adds a frame to the call stack, and each frame maintains pointers to the nodes in both lists.
    - In contrast, an iterative approach would use O(1) space, maintaining only two pointers, one for each list.
 
@@ -144,7 +143,7 @@ Let’s now examine why iteration would be more efficient for this type of probl
 
 ### Iteration is Better for:
 
-- **Linear Traversals:** Problems where you need to simply walk through data (like a linked list) are best solved iteratively. 
+- **Linear Traversals:** Problems where you need to simply walk through data (like a linked list) are best solved iteratively.
 - **State Updates:** Problems that require updating states or accumulating results (like summing numbers in an array or checking conditions in a loop) benefit from the efficiency of iteration.
 - **Memory Efficiency:** For problems that need to be solved for very large datasets where memory consumption is a concern, an iterative approach will usually be more efficient due to its constant space usage.
 

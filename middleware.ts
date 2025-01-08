@@ -8,7 +8,7 @@ export function middleware(request: NextRequest) {
   // Define CSP Header
   const cspHeader = `
     default-src 'self';
-    script-src 'self' 'unsafe-eval' 'unsafe-inline' giscus.app analytics.umami.is va.vercel-scripts.com vercel.live;
+    script-src 'self' 'unsafe-eval' 'unsafe-inline' giscus.app analytics.umami.is va.vercel-scripts.com vercel.live *.vercel-analytics.com;
     style-src 'self' 'unsafe-inline';
     img-src 'self' blob: data: https:;
     font-src 'self';
@@ -17,8 +17,10 @@ export function middleware(request: NextRequest) {
     form-action 'self';
     frame-ancestors 'none';
     frame-src giscus.app;
-    connect-src 'self' vitals.vercel-insights.com va.vercel-scripts.com;
-  `.replace(/\s{2,}/g, ' ').trim()
+    connect-src 'self' vitals.vercel-insights.com va.vercel-scripts.com *.vercel-analytics.com;
+  `
+    .replace(/\s{2,}/g, ' ')
+    .trim()
 
   // Set security headers
   const headers = response.headers
@@ -49,4 +51,4 @@ export const config = {
       ],
     },
   ],
-} 
+}

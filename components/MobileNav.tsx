@@ -6,7 +6,12 @@ import { Fragment, useState, useEffect, useRef } from 'react'
 import Link from './Link'
 import headerNavLinks from '@/data/headerNavLinks'
 
-const MobileNav = () => {
+interface MobileNavProps {
+  isOpen: boolean
+  onClose: () => void
+}
+
+const MobileNav = ({ isOpen, onClose }: MobileNavProps) => {
   const [navShow, setNavShow] = useState(false)
   const navRef = useRef(null)
 

@@ -13,11 +13,13 @@ In this post, we explore Unity’s `SharedMesh` property, mesh manipulation, and
 The `Mesh` property in Unity applies to the specific instance of the mesh that has been created for a given object. However, when you use the `SharedMesh` property, it refers to the actual mesh asset itself. This means that any changes made to the shared mesh will affect all GameObjects that use the same mesh reference.
 
 For example:
+
 - **`Mesh`**: Changes apply only to the instance of the mesh on the current GameObject.
 - **`SharedMesh`**: Changes affect all GameObjects sharing the same mesh asset.
 
 <aside>
-⚠️ **Tip**: It is recommended to use `SharedMesh` primarily for **reading mesh data** and avoid using it to write or modify mesh data to prevent unintentional changes across multiple objects.
+  ⚠️ **Tip**: It is recommended to use `SharedMesh` primarily for **reading mesh data** and avoid
+  using it to write or modify mesh data to prevent unintentional changes across multiple objects.
 </aside>
 
 You can refer to Unity's documentation for more details: [MeshFilter.sharedMesh](https://docs.unity3d.com/ScriptReference/MeshFilter-sharedMesh.html)

@@ -15,6 +15,7 @@ My solution to the LeetCode problem 1130 - Minimum Cost Tree From Leaf Values. T
 The problem requires us to construct a binary tree where each leaf node has a value from a given array. The task is to minimize the cost of building the tree. The cost of the tree is the sum of the product of the values of the two leaves used to create each non-leaf node.
 
 ### Problem Constraints:
+
 1. The array contains integers greater than zero.
 2. We are asked to minimize the sum product of leaves as we build the tree.
 
@@ -23,6 +24,7 @@ The problem requires us to construct a binary tree where each leaf node has a va
 ## Solution: Greedy Approach with Mono Struct
 
 ### Key Concepts:
+
 1. **Greedy Technique**: At each step, remove the smallest leaf to minimize the immediate cost.
 2. **Mono Struct**: A structure that maintains the values in a particular order to help optimize our approach.
 
@@ -35,7 +37,7 @@ public:
         int result = 0;
         stack<int> s;
         s.push(INT_MAX);  // add a large value to compare
-        
+
         for (int value : arr) {
             while (s.top() <= value) {
                 int mid = s.top();
@@ -44,13 +46,13 @@ public:
             }
             s.push(value);
         }
-        
+
         while (s.size() > 2) {  // clean up the remaining elements in the stack
             int mid = s.top();
             s.pop();
             result += mid * s.top();
         }
-        
+
         return result;
     }
 };
