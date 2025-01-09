@@ -1,11 +1,30 @@
 'use client'
 
 import { useEffect, useCallback, useRef, useState } from 'react'
-import type { DetectorState, HandposeDetectorProps } from '@/types/handpose'
-import { useHandDetector } from '@/hooks/useHandDetector'
 import { useCamera } from '@/hooks/useCamera'
+import { useHandDetector } from '@/hooks/useHandDetector'
+import type { DetectorState, HandposeDetectorProps } from '@/types/handpose'
 import { debug, isVideoReady, validateHandData, calculateWindowCoordinates } from '@/utils/handpose'
 
+/**
+ * HandposeDetector component handles real-time hand pose detection using a webcam feed.
+ * It manages camera access, model initialization, and continuous hand detection.
+ *
+ * @param {HandposeDetectorProps} props
+ * @param {(points: {x: number, y: number}[]) => void} props.onHandMove - Callback fired when hand position changes
+ * @param {boolean} props.isEnabled - Whether hand detection is currently enabled
+ *
+ * The component:
+ * 1. Sets up camera access and initializes TensorFlow hand detection model
+ * 2. Runs continuous detection loop when enabled
+ * 3. Processes detected hand data into window coordinates
+ * 4. Cleans up resources when disabled
+ *
+ * State management:
+ * - isModelLoaded: Whether TensorFlow model is initialized
+ * - hasRequestedPermission: Whether camera permissions were requested
+ * - error: Any error state during setup/detection
+ */
 export function HandposeDetector({ onHandMove, isEnabled }: HandposeDetectorProps) {
   const { videoRef, setupCamera, releaseCamera } = useCamera()
   const { initializeDetector, detectHands, resetDetector } = useHandDetector()

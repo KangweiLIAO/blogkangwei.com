@@ -3,6 +3,16 @@ import { FALLBACK_VIDEO_CONSTRAINTS } from '@/constants/handpose'
 import { debug, handleCameraError } from '@/utils/handpose'
 import type { VideoConstraints } from '@/types/handpose'
 
+/**
+ * Custom hook for managing camera access and video stream setup.
+ * Provides functionality to initialize camera stream, attach it to a video element,
+ * and properly release camera resources when done.
+ *
+ * @returns {Object} Object containing:
+ *   - videoRef: React ref for the video element
+ *   - setupCamera: Function to initialize camera stream
+ *   - releaseCamera: Function to stop camera stream and release resources
+ */
 export const useCamera = () => {
   const videoRef = useRef<HTMLVideoElement>(null)
 
@@ -11,6 +21,8 @@ export const useCamera = () => {
 
     const setupVideoStream = async (constraints: VideoConstraints) => {
       const stream = await navigator.mediaDevices.getUserMedia(constraints)
+
+      // set the video stream as the source object for the video element
       videoRef.current!.srcObject = stream
 
       await new Promise<void>((resolve) => {
@@ -24,8 +36,9 @@ export const useCamera = () => {
         }
       })
 
+      // play the video and wait for .5 second to ensure proper initialization
       await videoRef.current!.play()
-      await new Promise((resolve) => setTimeout(resolve, 1000))
+      await new Promise((resolve) => setTimeout(resolve, 500))
     }
 
     try {
@@ -38,6 +51,9 @@ export const useCamera = () => {
     }
   }, [])
 
+  /**
+   * Stops all tracks in the video stream and releases camera resources
+   */
   const releaseCamera = useCallback(() => {
     if (videoRef.current?.srcObject) {
       const stream = videoRef.current.srcObject as MediaStream

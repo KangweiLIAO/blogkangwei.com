@@ -5,7 +5,7 @@
     "lib": ["dom", "dom.iterable", "esnext"],
     "allowJs": true,
     "skipLibCheck": true,
-    "strict": false,
+    "strict": true,
     "forceConsistentCasingInFileNames": true,
     "noEmit": true,
     "composite": true,
@@ -26,6 +26,8 @@
       "@/types/*": ["types/*"],
       "@/utils/*": ["utils/*"],
       "@/constants/*": ["constants/*"],
+      "@/services/*": ["services/*"],
+      "@/config/*": ["config/*"],
       "contentlayer/generated": ["./.contentlayer/generated"]
     },
     "plugins": [

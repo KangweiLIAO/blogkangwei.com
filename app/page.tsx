@@ -3,6 +3,7 @@ import { Github, Linkedin, FileText } from 'lucide-react'
 import Link from '@/components/Link'
 import { InteractiveDots } from '@/components/InteractiveDots'
 import siteMetadata from '@/data/siteMetadata'
+import { ContentCard } from '@/components/ContentCard'
 
 export default function Home() {
   return (
@@ -13,8 +14,8 @@ export default function Home() {
       </div>
 
       {/* Main content */}
-      <main className="container relative z-10 mx-auto px-6 pt-20 lg:pt-32">
-        <div className="max-w-[640px]">
+      <main className="container relative left-auto z-10 ml-24 px-6 pt-20 lg:pt-32">
+        <ContentCard className="max-w-[720px]">
           <div className="space-y-6">
             <h1 className="space-y-4">
               <span className="text-muted-foreground block text-lg font-medium">Hi, I am</span>
@@ -24,13 +25,13 @@ export default function Home() {
             </h1>
             <p className="text-muted-foreground text-xl">{siteMetadata.description}</p>
             <div className="flex flex-wrap gap-4 pt-4">
-              <Button variant="pill" size="pill" asChild>
+              <Button variant="rounded" size="rounded" asChild>
                 <Link href="/resume" className="gap-2">
                   <FileText className="h-4 w-4" />
                   Resume
                 </Link>
               </Button>
-              <Button variant="pill" size="pill" asChild>
+              <Button variant="rounded" size="rounded" asChild>
                 <Link
                   href={siteMetadata.github || '#'}
                   className="gap-2"
@@ -40,7 +41,7 @@ export default function Home() {
                   GitHub
                 </Link>
               </Button>
-              <Button variant="pill" size="pill" asChild>
+              <Button variant="rounded" size="rounded" asChild>
                 <Link
                   href={siteMetadata.linkedin || '#'}
                   className="gap-2"
@@ -52,7 +53,7 @@ export default function Home() {
               </Button>
             </div>
           </div>
-        </div>
+        </ContentCard>
       </main>
     </div>
   )

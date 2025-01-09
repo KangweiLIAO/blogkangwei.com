@@ -1,10 +1,20 @@
 import { useCallback, useRef } from 'react'
+import { DETECTOR_CONFIG } from '@/constants/handpose'
+import { debug } from '@/utils/handpose'
 import * as tf from '@tensorflow/tfjs'
 import * as handPoseDetection from '@tensorflow-models/hand-pose-detection'
 import '@tensorflow/tfjs-backend-webgl'
-import { DETECTOR_CONFIG } from '@/constants/handpose'
-import { debug } from '@/utils/handpose'
 
+/**
+ * Custom hook for hand pose detection using TensorFlow.js and MediaPipe Hands model.
+ * Provides functionality to initialize the detector, detect hands in video frames,
+ * and reset the detector state.
+ *
+ * @returns {Object} Object containing detector control functions:
+ *   - initializeDetector: Initializes the TensorFlow backend and hand detector
+ *   - detectHands: Detects hands in a video frame
+ *   - resetDetector: Resets the detector state
+ */
 export const useHandDetector = () => {
   const detectorRef = useRef<handPoseDetection.HandDetector | null>(null)
 
@@ -27,6 +37,11 @@ export const useHandDetector = () => {
     }
   }, [])
 
+  /**
+   * Detects hands in a video frame using the initialized detector
+   * @param video - HTML video element containing the frame to analyze
+   * @returns The first detected hand or null if no hands detected
+   */
   const detectHands = useCallback(async (video: HTMLVideoElement) => {
     if (!detectorRef.current) {
       debug('Detector not initialized')
@@ -43,6 +58,9 @@ export const useHandDetector = () => {
     }
   }, [])
 
+  /**
+   * Resets the detector reference to null
+   */
   const resetDetector = useCallback(() => {
     detectorRef.current = null
   }, [])
