@@ -1,13 +1,20 @@
 'use client'
 
-import { useEffect, useRef } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { useTheme } from 'next-themes'
+import { HandposeDetector } from './HandposeDetector'
+import { HandposeToggle } from './HandposeToggle'
 
 interface Point {
   x: number
   y: number
   color: string
   glowColor: string
+}
+
+interface HandPoint {
+  x: number
+  y: number
 }
 
 interface DotsConfig {
@@ -48,11 +55,12 @@ const defaultConfig: DotsConfig = {
 
 export function InteractiveDots({ config = {} }: { config?: DotsConfig }) {
   const canvasRef = useRef<HTMLCanvasElement>(null)
-  const mouseRef = useRef<{ x: number; y: number }>({ x: 0, y: 0 })
+  const pointerRef = useRef<HandPoint[]>([])
   const dotsRef = useRef<Point[]>([])
   const animationFrameRef = useRef<number>()
   const resizeObserverRef = useRef<ResizeObserver>()
   const { theme } = useTheme()
+  const [isHandposeEnabled, setIsHandposeEnabled] = useState(false)
 
   // Merge default config with provided config
   const finalConfig = { ...defaultConfig, ...config }
@@ -92,8 +100,10 @@ export function InteractiveDots({ config = {} }: { config?: DotsConfig }) {
           const xPercent = x / rect.width
           const yPercent = y / rect.height
 
-          const startColor = theme === 'dark' ? finalConfig.darkModeStartColor! : finalConfig.lightModeStartColor!
-          const endColor = theme === 'dark' ? finalConfig.darkModeEndColor! : finalConfig.lightModeEndColor!
+          const startColor =
+            theme === 'dark' ? finalConfig.darkModeStartColor! : finalConfig.lightModeStartColor!
+          const endColor =
+            theme === 'dark' ? finalConfig.darkModeEndColor! : finalConfig.lightModeEndColor!
           const r = Math.round(
             startColor[0] + (endColor[0] - startColor[0]) * ((xPercent + yPercent) / 2)
           )
@@ -144,23 +154,38 @@ export function InteractiveDots({ config = {} }: { config?: DotsConfig }) {
       const dpr = window.devicePixelRatio || 1
       ctx.clearRect(0, 0, canvas.width / dpr, canvas.height / dpr)
 
-      const { x: mouseX, y: mouseY } = mouseRef.current
-
       // Set global composite operation for glow effect
       ctx.globalCompositeOperation = 'source-over'
 
       dotsRef.current.forEach((dot) => {
-        const dx = mouseX - dot.x
-        const dy = mouseY - dot.y
-        const distance = Math.sqrt(dx * dx + dy * dy)
+        let maxForce = 0
+        let forceDx = 0
+        let forceDy = 0
+
+        // Calculate combined force from all hand points
+        pointerRef.current.forEach((pointer) => {
+          const dx = pointer.x - dot.x
+          const dy = pointer.y - dot.y
+          const distance = Math.sqrt(dx * dx + dy * dy)
+
+          if (distance < finalConfig.maxForceDistance! && distance > 0) {
+            const force =
+              (1 - distance / finalConfig.maxForceDistance!) * finalConfig.forceStrength!
+            if (force > maxForce) {
+              maxForce = force
+              forceDx = dx
+              forceDy = dy
+            }
+          }
+        })
 
         let drawX = dot.x
         let drawY = dot.y
 
-        if (distance < finalConfig.maxForceDistance! && distance > 0) {
-          const force = (1 - distance / finalConfig.maxForceDistance!) * finalConfig.forceStrength!
-          drawX -= (dx / distance) * force
-          drawY -= (dy / distance) * force
+        if (maxForce > 0) {
+          const distance = Math.sqrt(forceDx * forceDx + forceDy * forceDy)
+          drawX -= (forceDx / distance) * maxForce
+          drawY -= (forceDy / distance) * maxForce
         }
 
         // Draw glow
@@ -194,17 +219,34 @@ export function InteractiveDots({ config = {} }: { config?: DotsConfig }) {
   // Mouse movement handler
   useEffect(() => {
     const handleMouseMove = (event: MouseEvent) => {
-      if (!canvasRef.current) return
+      if (!canvasRef.current || isHandposeEnabled) return
       const rect = canvasRef.current.getBoundingClientRect()
-      mouseRef.current = {
-        x: event.clientX - rect.left,
-        y: event.clientY - rect.top,
-      }
+      pointerRef.current = [
+        {
+          x: event.clientX - rect.left,
+          y: event.clientY - rect.top,
+        },
+      ]
     }
 
     window.addEventListener('mousemove', handleMouseMove)
     return () => window.removeEventListener('mousemove', handleMouseMove)
-  }, [])
+  }, [isHandposeEnabled])
 
-  return <canvas ref={canvasRef} className="absolute inset-0 h-full w-full" aria-hidden="true" />
+  const handleHandMove = (handPoints: HandPoint[]) => {
+    if (!canvasRef.current) return
+    const rect = canvasRef.current.getBoundingClientRect()
+    pointerRef.current = handPoints.map((point) => ({
+      x: point.x - rect.left,
+      y: point.y - rect.top,
+    }))
+  }
+
+  return (
+    <>
+      <canvas ref={canvasRef} className="absolute inset-0 h-full w-full" aria-hidden="true" />
+      <HandposeDetector isEnabled={isHandposeEnabled} onHandMove={handleHandMove} />
+      <HandposeToggle isEnabled={isHandposeEnabled} onToggle={setIsHandposeEnabled} />
+    </>
+  )
 }

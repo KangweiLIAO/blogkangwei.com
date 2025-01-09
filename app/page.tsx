@@ -6,7 +6,7 @@ import siteMetadata from '@/data/siteMetadata'
 
 export default function Home() {
   return (
-    <div className="from-background to-background/95 relative min-h-screen overflow-hidden bg-gradient-to-b">
+    <div className="from-background to-background/95 relative h-[calc(100vh-25vh)] overflow-hidden bg-gradient-to-b">
       {/* Interactive dot pattern background */}
       <div className="absolute inset-0 h-full w-full" aria-hidden="true">
         <InteractiveDots />

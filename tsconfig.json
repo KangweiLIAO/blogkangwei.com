@@ -22,6 +22,10 @@
       "@/layouts/*": ["layouts/*"],
       "@/css/*": ["css/*"],
       "@/lib/*": ["lib/*"],
+      "@/hooks/*": ["hooks/*"],
+      "@/types/*": ["types/*"],
+      "@/utils/*": ["utils/*"],
+      "@/constants/*": ["constants/*"],
       "contentlayer/generated": ["./.contentlayer/generated"]
     },
     "plugins": [
