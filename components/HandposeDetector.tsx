@@ -76,7 +76,7 @@ export function HandposeDetector({ onHandMove, isEnabled }: HandposeDetectorProp
     if (isEnabled) {
       animationFrameRef.current = requestAnimationFrame(runDetectionLoop)
     }
-  }, [isEnabled, processHandData])
+  }, [isEnabled, processHandData, videoRef])
 
   useEffect(() => {
     if (!isEnabled || state.hasRequestedPermission) return

@@ -7,26 +7,31 @@ import { ContentCard } from '@/components/ContentCard'
 
 export default function Home() {
   return (
-    <div className="from-background to-background/95 relative h-[calc(100vh-25vh)] overflow-hidden bg-gradient-to-b">
+    <div className="from-background to-background/95 relative min-h-[75vh] overflow-hidden bg-gradient-to-b">
       {/* Interactive dot pattern background */}
       <div className="absolute inset-0 h-full w-full" aria-hidden="true">
         <InteractiveDots />
       </div>
 
       {/* Main content */}
-      <main className="container relative left-auto z-10 ml-24 px-6 pt-20 lg:pt-32">
-        <ContentCard className="max-w-[720px]">
+      <main className="container relative z-10 mx-auto flex min-h-[75vh] items-center px-4 py-8 sm:px-6 md:py-12 lg:px-8">
+        <ContentCard className="mx-auto max-w-[720px]">
           <div className="space-y-6">
             <h1 className="space-y-4">
-              <span className="text-muted-foreground block text-lg font-medium">Hi, I am</span>
-              <span className="block text-6xl font-bold tracking-tight lg:text-7xl">
+              <span className="text-muted-foreground block text-base font-medium sm:text-lg">
+                Hi, I am
+              </span>
+              <span className="block text-4xl font-bold tracking-tight sm:text-5xl md:text-6xl lg:text-7xl">
                 {siteMetadata.author}
               </span>
             </h1>
-            <p className="text-muted-foreground text-xl">{siteMetadata.description}</p>
-            <div className="flex flex-wrap gap-4 pt-4">
+            <p className="text-muted-foreground text-lg sm:text-xl">{siteMetadata.description}</p>
+            <div className="flex flex-wrap gap-3 pt-4 sm:gap-4">
               <Button variant="rounded" size="rounded" asChild>
-                <Link href="/resume" className="gap-2">
+                <Link
+                  href="https://drive.google.com/file/d/1Xjdc81jPkGDt219kGxukgUVX22HolUgA/view?usp=sharing"
+                  className="gap-2"
+                >
                   <FileText className="h-4 w-4" />
                   Resume
                 </Link>

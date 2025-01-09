@@ -1,4 +1,7 @@
+'use client'
+
 import dynamic from 'next/dynamic'
+import { useState } from 'react'
 import siteMetadata from '@/data/siteMetadata'
 import headerNavLinks from '@/data/headerNavLinks'
 import Link from './Link'
@@ -7,6 +10,7 @@ import ThemeSwitch from './ThemeSwitch'
 import SearchButton from './SearchButton'
 
 const Header = () => {
+  const [isNavOpen, setIsNavOpen] = useState(false)
   let headerClass = 'flex items-center justify-between py-10'
   if (siteMetadata.stickyNav) {
     headerClass += ' sticky top-0 z-50'
@@ -49,7 +53,7 @@ const Header = () => {
           </div>
           <SearchButton />
           <ThemeSwitch />
-          <MobileNav />
+          <MobileNav isOpen={isNavOpen} onClose={() => setIsNavOpen(false)} />
         </div>
       </header>
     </div>
