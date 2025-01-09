@@ -14,4 +14,4 @@ export const defaultConfig: DotsConfig = {
   darkModeBackground: 'rgb(0, 0, 0)',
   lightModeBackground: 'rgb(255, 255, 255)',
   gradientSize: 64,
-} 
+}

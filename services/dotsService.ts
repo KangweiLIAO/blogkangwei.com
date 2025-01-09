@@ -73,8 +73,7 @@ export class DotsService {
         const distance = Math.sqrt(dx * dx + dy * dy)
 
         if (distance < this.config.maxForceDistance! && distance > 0) {
-          const force =
-            (1 - distance / this.config.maxForceDistance!) * this.config.forceStrength!
+          const force = (1 - distance / this.config.maxForceDistance!) * this.config.forceStrength!
           if (force > maxForce) {
             maxForce = force
             forceDx = dx
@@ -150,4 +149,4 @@ export class DotsService {
     ctx.fillStyle = rightGradient
     ctx.fillRect(width - gradientSize, 0, gradientSize, height)
   }
-} 
+}
