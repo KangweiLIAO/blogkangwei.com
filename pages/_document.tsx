@@ -13,7 +13,8 @@ class MyDocument extends Document {
   }
 
   render() {
-    const { nonce } = this.props as { nonce: string }
+    // Use optional chaining and provide a default empty string
+    const nonce = ((this.props as any)?.nonce as string) ?? ''
 
     return (
       <Html>

@@ -7,17 +7,27 @@ import { MDXLayoutRenderer } from 'pliny/mdx-components'
 import { sortPosts, coreContent, allCoreContent } from 'pliny/utils/contentlayer'
 import { allBlogs, allAuthors } from 'contentlayer/generated'
 import type { Authors, Blog } from 'contentlayer/generated'
+import type { CoreContent } from 'pliny/utils/contentlayer'
 import PostSimple from '@/layouts/PostSimple'
 import PostLayout from '@/layouts/PostLayout'
 import PostBanner from '@/layouts/PostBanner'
 import { Metadata } from 'next'
 import siteMetadata from '@/data/siteMetadata'
 import { notFound } from 'next/navigation'
+import { ReactNode } from 'react'
+
+interface LayoutProps {
+  content: CoreContent<Blog>
+  authorDetails: CoreContent<Authors>[]
+  next?: { path: string; title: string }
+  prev?: { path: string; title: string }
+  children: ReactNode
+}
 
 type LayoutKeys = 'PostSimple' | 'PostLayout' | 'PostBanner'
 const defaultLayout = 'PostLayout' satisfies LayoutKeys
 
-const layouts: Record<LayoutKeys, React.ComponentType<any>> = {
+const layouts: Record<LayoutKeys, React.ComponentType<LayoutProps>> = {
   PostSimple,
   PostLayout,
   PostBanner,

@@ -78,7 +78,7 @@ export function InteractiveDots({ config = {} }: { config?: DotsConfig }) {
 
     window.addEventListener('mousemove', handleMouseMove)
     return () => window.removeEventListener('mousemove', handleMouseMove)
-  }, [isHandposeEnabled, canvasRef])
+  }, [isHandposeEnabled])
 
   const handleHandMove = (handPoints: HandPoint[]) => {
     if (!canvasRef.current) return
