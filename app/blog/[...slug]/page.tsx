@@ -14,8 +14,10 @@ import { Metadata } from 'next'
 import siteMetadata from '@/data/siteMetadata'
 import { notFound } from 'next/navigation'
 
-const defaultLayout = 'PostLayout'
-const layouts = {
+type LayoutKeys = 'PostSimple' | 'PostLayout' | 'PostBanner'
+const defaultLayout = 'PostLayout' satisfies LayoutKeys
+
+const layouts: Record<LayoutKeys, React.ComponentType<any>> = {
   PostSimple,
   PostLayout,
   PostBanner,
@@ -104,7 +106,8 @@ export default async function Page({ params }: { params: { slug: string[] } }) {
     }
   })
 
-  const Layout = layouts[post.layout || defaultLayout]
+  const layout = (post.layout || defaultLayout) as LayoutKeys
+  const Layout = layouts[layout]
 
   return (
     <>
