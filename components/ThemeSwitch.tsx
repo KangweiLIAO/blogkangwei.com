@@ -2,8 +2,9 @@
 
 import { useEffect, useState } from 'react'
 import { useTheme } from 'next-themes'
+import type { FC } from 'react'
 
-const Sun = () => (
+const Sun: FC = () => (
   <svg
     xmlns="http://www.w3.org/2000/svg"
     viewBox="0 0 20 20"
@@ -18,7 +19,7 @@ const Sun = () => (
   </svg>
 )
 
-const Moon = () => (
+const Moon: FC = () => (
   <svg
     xmlns="http://www.w3.org/2000/svg"
     viewBox="0 0 20 20"
@@ -29,16 +30,16 @@ const Moon = () => (
   </svg>
 )
 
-const Blank = () => <svg className="h-6 w-6" />
+const Blank: FC = () => <svg className="h-6 w-6" />
 
-const ThemeSwitch = () => {
-  const [mounted, setMounted] = useState(false)
+const ThemeSwitch: FC = () => {
+  const [mounted, setMounted] = useState<boolean>(false)
   const { resolvedTheme, setTheme } = useTheme()
 
   // When mounted on client, now we can show the UI
   useEffect(() => setMounted(true), [])
 
-  const toggleTheme = () => {
+  const toggleTheme = (): void => {
     setTheme(resolvedTheme === 'dark' ? 'light' : 'dark')
   }
 
