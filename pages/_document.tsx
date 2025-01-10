@@ -23,8 +23,8 @@ class MyDocument extends Document {
           <Main />
           <NextScript nonce={nonce} />
           {/* TensorFlow.js scripts with nonce */}
-          <script 
-            nonce={nonce} 
+          <script
+            nonce={nonce}
             src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs-core/dist/tf-core.js"
             crossOrigin="anonymous"
           />

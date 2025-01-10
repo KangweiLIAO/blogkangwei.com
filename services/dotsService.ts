@@ -35,9 +35,15 @@ export class DotsService {
       const xPercent = x / width
       const yPercent = y / height
 
-      const r = Math.round(startColor[0] + (endColor[0] - startColor[0]) * ((xPercent + yPercent) / 2))
-      const g = Math.round(startColor[1] + (endColor[1] - startColor[1]) * ((xPercent + yPercent) / 2))
-      const b = Math.round(startColor[2] + (endColor[2] - startColor[2]) * ((xPercent + yPercent) / 2))
+      const r = Math.round(
+        startColor[0] + (endColor[0] - startColor[0]) * ((xPercent + yPercent) / 2)
+      )
+      const g = Math.round(
+        startColor[1] + (endColor[1] - startColor[1]) * ((xPercent + yPercent) / 2)
+      )
+      const b = Math.round(
+        startColor[2] + (endColor[2] - startColor[2]) * ((xPercent + yPercent) / 2)
+      )
 
       dot.targetColor = `rgb(${r}, ${g}, ${b})`
       dot.targetGlowColor = `rgba(${r}, ${g}, ${b}, ${this.config.glowOpacity})`
@@ -62,17 +68,15 @@ export class DotsService {
         ? this.config.handposeDarkEndColor!
         : this.config.handposeLightEndColor!
     }
-    return this.theme === 'dark'
-      ? this.config.darkModeEndColor!
-      : this.config.lightModeEndColor!
+    return this.theme === 'dark' ? this.config.darkModeEndColor! : this.config.lightModeEndColor!
   }
 
   private interpolateColor(dot: DotState, deltaTime: number): void {
     const progress = Math.min(
       1,
-      dot.transitionProgress + (deltaTime / this.config.transitionDuration!)
+      dot.transitionProgress + deltaTime / this.config.transitionDuration!
     )
-    
+
     if (progress < 1) {
       const currentColor = this.parseColor(dot.color)
       const targetColor = this.parseColor(dot.targetColor)
@@ -101,7 +105,7 @@ export class DotsService {
       parseInt(match[1]),
       parseInt(match[2]),
       parseInt(match[3]),
-      match[4] ? parseFloat(match[4]) : 1
+      match[4] ? parseFloat(match[4]) : 1,
     ]
   }
 
@@ -144,7 +148,7 @@ export class DotsService {
           glowColor,
           targetColor: color,
           targetGlowColor: glowColor,
-          transitionProgress: 1
+          transitionProgress: 1,
         })
       }
     }
@@ -159,7 +163,7 @@ export class DotsService {
     ctx.clearRect(0, 0, width, height)
 
     // Update color transitions
-    this.dots.forEach(dot => this.interpolateColor(dot, deltaTime))
+    this.dots.forEach((dot) => this.interpolateColor(dot, deltaTime))
 
     // Draw dots with force effects
     ctx.globalCompositeOperation = 'source-over'
