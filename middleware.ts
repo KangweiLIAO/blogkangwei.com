@@ -24,60 +24,84 @@ export function middleware(request: NextRequest) {
   // Check if running in development environment
   const isDev = process.env.NODE_ENV === 'development'
 
-  // Skip CSP in development for easier debugging
-  if (isDev) {
-    return NextResponse.next()
-  }
+  // Define trusted domains for Vercel Analytics
+  const vercelDomains = [
+    'vercel.com',
+    '*.vercel.com',
+    'vercel.app',
+    '*.vercel.app',
+    'vercel.live',
+    '*.vercel.live',
+  ]
 
   // Define Content Security Policy directives
-  // Controls which resources can be loaded and from where
   const cspHeader = [
-    // Only allow resources from same origin
-    "default-src 'self'",
+    // Default source restrictions
+    `default-src 'self' ${vercelDomains.join(' ')}`,
 
-    // Scripts must have nonce or be loaded via strict-dynamic
-    `script-src 'self' 'nonce-${nonce}' 'strict-dynamic'`,
+    // Scripts configuration
+    isDev
+      ? "script-src 'self' 'unsafe-inline' 'unsafe-eval'"
+      : `script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.jsdelivr.net https: http: blob: ${vercelDomains.join(' ')} 'wasm-unsafe-eval' 'inline-speculation-rules'`,
 
     // Allow inline styles
     "style-src 'self' 'unsafe-inline'",
 
-    // Allow images from any source including blobs and data URIs
-    "img-src 'self' blob: data: *",
+    // Allow images from any source
+    "img-src 'self' blob: data: https: http:",
 
-    // Allow media from same origin, blobs, data URIs and mediastream
+    // Allow media
     "media-src 'self' blob: data: mediastream:",
 
-    // Define allowed external connections
-    "connect-src 'self' https://tfhub.dev https://*.tfhub.dev https://*.vercel-insights.com https://*.vercel-analytics.com https://va.vercel-scripts.com",
+    // Allow connections
+    `connect-src 'self' blob: ${vercelDomains.join(' ')} https://* wss://* http://localhost:* ws://localhost:* https://cdn.jsdelivr.net`,
 
-    // Only allow fonts from same origin
-    "font-src 'self'",
+    // Allow fonts
+    "font-src 'self' data:",
 
-    // Only allow frames from same origin
-    "frame-src 'self'",
+    // Frame configuration
+    "frame-src 'self' https: http:",
 
-    // Allow web workers from same origin and blobs
-    "worker-src 'self' blob:",
+    // Worker configuration
+    "worker-src 'self' blob: 'unsafe-eval' https://cdn.jsdelivr.net",
 
-    // Allow child frames from same origin and blobs
+    // Allow WebAssembly
+    "script-src-elem 'self' 'unsafe-inline' https://cdn.jsdelivr.net",
+
+    // Child source configuration
     "child-src 'self' blob:",
 
-    // Restrict base URI to same origin
+    // Base URI restriction
     "base-uri 'self'",
 
-    // Only allow form submissions to same origin
+    // Form action restriction
     "form-action 'self'",
 
-    // Upgrade HTTP to HTTPS
-    'upgrade-insecure-requests',
+    // Manifest source restriction
+    "manifest-src 'self'",
+
+    // Object source restriction
+    "object-src 'none'",
+
+    // Upgrade insecure requests
+    ...(process.env.NODE_ENV === 'production' ? ['upgrade-insecure-requests'] : []),
   ]
     .filter(Boolean)
     .join('; ')
 
-  // Set up request headers with nonce and CSP
+  // Set up request headers
   const requestHeaders = new Headers()
   requestHeaders.set('x-nonce', nonce)
   requestHeaders.set('Content-Security-Policy', cspHeader.replace(/\s{2,}/g, ' ').trim())
+
+  // Add additional security headers
+  const securityHeaders = {
+    'X-Content-Type-Options': 'nosniff',
+    'X-Frame-Options': 'DENY',
+    'X-XSS-Protection': '1; mode=block',
+    'Referrer-Policy': 'strict-origin-when-cross-origin',
+    'Permissions-Policy': 'camera=self',
+  }
 
   // Create response with modified headers
   const response = NextResponse.next({
@@ -86,9 +110,14 @@ export function middleware(request: NextRequest) {
     },
   })
 
-  // Set CSP and nonce headers on response
+  // Set CSP and security headers on response
   response.headers.set('Content-Security-Policy', cspHeader)
   response.headers.set('x-nonce', nonce)
+
+  // Add all security headers
+  Object.entries(securityHeaders).forEach(([key, value]) => {
+    response.headers.set(key, value)
+  })
 
   return response
 }

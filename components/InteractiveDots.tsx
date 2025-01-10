@@ -21,7 +21,18 @@ export function InteractiveDots({ config = {} }: { config?: DotsConfig }) {
   const { theme = 'light' } = useTheme()
   const [isHandposeEnabled, setIsHandposeEnabled] = useState(false)
 
-  const finalConfig = useMemo(() => ({ ...defaultConfig, ...config }), [config])
+  const finalConfig = useMemo(
+    () => ({
+      ...defaultConfig,
+      ...config,
+      handposeDarkStartColor: [255, 100, 50] as [number, number, number],
+      handposeDarkEndColor: [50, 200, 255] as [number, number, number],
+      handposeLightStartColor: [255, 150, 50] as [number, number, number],
+      handposeLightEndColor: [50, 150, 255] as [number, number, number],
+      transitionDuration: 500,
+    }),
+    [config]
+  )
 
   // Initialize dots service and handle canvas sizing
   useEffect(() => {
@@ -31,6 +42,13 @@ export function InteractiveDots({ config = {} }: { config?: DotsConfig }) {
       dotsServiceRef.current.initializeDots(canvasSize)
     }
   }, [theme, finalConfig, initCanvas])
+
+  // Handle handpose mode changes
+  useEffect(() => {
+    if (dotsServiceRef.current) {
+      dotsServiceRef.current.setHandposeMode(isHandposeEnabled)
+    }
+  }, [isHandposeEnabled])
 
   // Animation loop with FPS throttling
   useEffect(() => {
@@ -61,7 +79,7 @@ export function InteractiveDots({ config = {} }: { config?: DotsConfig }) {
         cancelAnimationFrame(animationFrameRef.current)
       }
     }
-  }, [initCanvas])
+  }, [initCanvas, canvasRef])
 
   // Mouse movement handler
   useEffect(() => {
@@ -78,7 +96,7 @@ export function InteractiveDots({ config = {} }: { config?: DotsConfig }) {
 
     window.addEventListener('mousemove', handleMouseMove)
     return () => window.removeEventListener('mousemove', handleMouseMove)
-  }, [isHandposeEnabled])
+  }, [isHandposeEnabled, canvasRef])
 
   const handleHandMove = (handPoints: HandPoint[]) => {
     if (!canvasRef.current) return

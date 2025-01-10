@@ -14,8 +14,8 @@ export default function Home() {
       </div>
 
       {/* Main content */}
-      <main className="container relative z-10 mx-auto flex min-h-[75vh] items-center px-4 py-8 sm:px-6 md:py-12 lg:px-8">
-        <ContentCard className="mx-auto max-w-[720px]">
+      <main className="md:item-start container relative z-10 flex min-h-[75vh] items-center px-4 py-8 md:items-start md:py-12 lg:px-8">
+        <ContentCard className="mx-auto max-w-[720px] lg:ml-[30px] lg:mt-[30px]">
           <div className="space-y-6">
             <h1 className="space-y-4">
               <span className="text-muted-foreground block text-base font-medium sm:text-lg">

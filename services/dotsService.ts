@@ -1,20 +1,121 @@
-import type { Point, DotsConfig, HandPoint, CanvasSize } from '@/types/dots'
+import type { Point, DotsConfig, HandPoint, CanvasSize, DotState } from '@/types/dots'
 
 export class DotsService {
-  private dots: Point[] = []
+  private dots: DotState[] = []
   private config: DotsConfig
   private theme: string
+  private isHandposeMode: boolean = false
+  private lastFrameTime: number = 0
 
   constructor(config: DotsConfig, theme: string) {
-    this.config = config
+    this.config = {
+      ...config,
+      handposeDarkStartColor: config.handposeDarkStartColor || [255, 100, 50],
+      handposeDarkEndColor: config.handposeDarkEndColor || [50, 200, 255],
+      handposeLightStartColor: config.handposeLightStartColor || [255, 150, 50],
+      handposeLightEndColor: config.handposeLightEndColor || [50, 150, 255],
+      transitionDuration: config.transitionDuration || 500,
+    }
     this.theme = theme
   }
 
+  setHandposeMode(enabled: boolean): void {
+    this.isHandposeMode = enabled
+    this.updateTargetColors()
+  }
+
+  private updateTargetColors(): void {
+    const startColor = this.getCurrentStartColor()
+    const endColor = this.getCurrentEndColor()
+
+    this.dots.forEach((dot, index) => {
+      const { x, y } = dot
+      const width = this.canvasSize?.width || 1
+      const height = this.canvasSize?.height || 1
+      const xPercent = x / width
+      const yPercent = y / height
+
+      const r = Math.round(startColor[0] + (endColor[0] - startColor[0]) * ((xPercent + yPercent) / 2))
+      const g = Math.round(startColor[1] + (endColor[1] - startColor[1]) * ((xPercent + yPercent) / 2))
+      const b = Math.round(startColor[2] + (endColor[2] - startColor[2]) * ((xPercent + yPercent) / 2))
+
+      dot.targetColor = `rgb(${r}, ${g}, ${b})`
+      dot.targetGlowColor = `rgba(${r}, ${g}, ${b}, ${this.config.glowOpacity})`
+      dot.transitionProgress = 0
+    })
+  }
+
+  private getCurrentStartColor(): [number, number, number] {
+    if (this.isHandposeMode) {
+      return this.theme === 'dark'
+        ? this.config.handposeDarkStartColor!
+        : this.config.handposeLightStartColor!
+    }
+    return this.theme === 'dark'
+      ? this.config.darkModeStartColor!
+      : this.config.lightModeStartColor!
+  }
+
+  private getCurrentEndColor(): [number, number, number] {
+    if (this.isHandposeMode) {
+      return this.theme === 'dark'
+        ? this.config.handposeDarkEndColor!
+        : this.config.handposeLightEndColor!
+    }
+    return this.theme === 'dark'
+      ? this.config.darkModeEndColor!
+      : this.config.lightModeEndColor!
+  }
+
+  private interpolateColor(dot: DotState, deltaTime: number): void {
+    const progress = Math.min(
+      1,
+      dot.transitionProgress + (deltaTime / this.config.transitionDuration!)
+    )
+    
+    if (progress < 1) {
+      const currentColor = this.parseColor(dot.color)
+      const targetColor = this.parseColor(dot.targetColor)
+      const currentGlow = this.parseColor(dot.glowColor)
+      const targetGlow = this.parseColor(dot.targetGlowColor)
+
+      const r = Math.round(currentColor[0] + (targetColor[0] - currentColor[0]) * progress)
+      const g = Math.round(currentColor[1] + (targetColor[1] - currentColor[1]) * progress)
+      const b = Math.round(currentColor[2] + (targetColor[2] - currentColor[2]) * progress)
+
+      const glowR = Math.round(currentGlow[0] + (targetGlow[0] - currentGlow[0]) * progress)
+      const glowG = Math.round(currentGlow[1] + (targetGlow[1] - currentGlow[1]) * progress)
+      const glowB = Math.round(currentGlow[2] + (targetGlow[2] - currentGlow[2]) * progress)
+      const glowA = currentGlow[3] + (targetGlow[3] - currentGlow[3]) * progress
+
+      dot.color = `rgb(${r}, ${g}, ${b})`
+      dot.glowColor = `rgba(${glowR}, ${glowG}, ${glowB}, ${glowA})`
+      dot.transitionProgress = progress
+    }
+  }
+
+  private parseColor(color: string): number[] {
+    const match = color.match(/rgba?\((\d+),\s*(\d+),\s*(\d+)(?:,\s*([.\d]+))?\)/)
+    if (!match) return [0, 0, 0, 1]
+    return [
+      parseInt(match[1]),
+      parseInt(match[2]),
+      parseInt(match[3]),
+      match[4] ? parseFloat(match[4]) : 1
+    ]
+  }
+
+  private canvasSize: CanvasSize | null = null
+
   initializeDots(canvasSize: CanvasSize): void {
+    this.canvasSize = canvasSize
     const { width, height } = canvasSize
     const cols = Math.ceil(width / this.config.spacing!)
     const rows = Math.ceil(height / this.config.spacing!)
     this.dots = []
+
+    const startColor = this.getCurrentStartColor()
+    const endColor = this.getCurrentEndColor()
 
     for (let i = 0; i < cols; i++) {
       for (let j = 0; j < rows; j++) {
@@ -22,11 +123,6 @@ export class DotsService {
         const y = j * this.config.spacing!
         const xPercent = x / width
         const yPercent = y / height
-
-        const startColor =
-          this.theme === 'dark' ? this.config.darkModeStartColor! : this.config.lightModeStartColor!
-        const endColor =
-          this.theme === 'dark' ? this.config.darkModeEndColor! : this.config.lightModeEndColor!
 
         const r = Math.round(
           startColor[0] + (endColor[0] - startColor[0]) * ((xPercent + yPercent) / 2)
@@ -38,11 +134,17 @@ export class DotsService {
           startColor[2] + (endColor[2] - startColor[2]) * ((xPercent + yPercent) / 2)
         )
 
+        const color = `rgb(${r}, ${g}, ${b})`
+        const glowColor = `rgba(${r}, ${g}, ${b}, ${this.config.glowOpacity})`
+
         this.dots.push({
           x,
           y,
-          color: `rgb(${r}, ${g}, ${b})`,
-          glowColor: `rgba(${r}, ${g}, ${b}, ${this.config.glowOpacity})`,
+          color,
+          glowColor,
+          targetColor: color,
+          targetGlowColor: glowColor,
+          transitionProgress: 1
         })
       }
     }
@@ -50,7 +152,14 @@ export class DotsService {
 
   render(ctx: CanvasRenderingContext2D, canvasSize: CanvasSize, pointers: HandPoint[]): void {
     const { width, height, dpr } = canvasSize
+    const currentTime = performance.now()
+    const deltaTime = this.lastFrameTime ? currentTime - this.lastFrameTime : 0
+    this.lastFrameTime = currentTime
+
     ctx.clearRect(0, 0, width, height)
+
+    // Update color transitions
+    this.dots.forEach(dot => this.interpolateColor(dot, deltaTime))
 
     // Draw dots with force effects
     ctx.globalCompositeOperation = 'source-over'

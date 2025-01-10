@@ -5,12 +5,17 @@ import 'remark-github-blockquote-alert/alert.css'
 import { Space_Grotesk } from 'next/font/google'
 import { Analytics } from '@vercel/analytics/react'
 import { SearchProvider, SearchConfig } from 'pliny/search'
+import { headers } from 'next/headers'
+import Script from 'next/script'
 import Header from '@/components/Header'
 import SectionContainer from '@/components/SectionContainer'
 import Footer from '@/components/Footer'
 import siteMetadata from '@/data/siteMetadata'
 import { ThemeProviders } from './theme-providers'
 import { Metadata } from 'next'
+import { viewport } from './viewport'
+
+export { viewport }
 
 const space_grotesk = Space_Grotesk({
   subsets: ['latin'],
@@ -71,15 +76,12 @@ export const metadata: Metadata = {
     ],
   },
   manifest: '/static/favicons/site.webmanifest',
-  themeColor: [
-    { media: '(prefers-color-scheme: light)', color: '#fff' },
-    { media: '(prefers-color-scheme: dark)', color: '#000' },
-  ],
 }
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   const basePath = process.env.BASE_PATH || ''
   const isProduction = process.env.NODE_ENV === 'production'
+  const nonce = headers().get('x-nonce') || undefined
 
   return (
     <html
@@ -87,17 +89,40 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       className={`${space_grotesk.variable} scroll-smooth`}
       suppressHydrationWarning
     >
-      <head />
-      <body className="bg-white pl-[calc(100vw-100%)] text-black antialiased dark:bg-gray-950 dark:text-white">
+      <head>
+        <Script
+          id="theme-script"
+          strategy="beforeInteractive"
+          dangerouslySetInnerHTML={{
+            __html: `
+              try {
+                if (localStorage.theme === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+                  document.documentElement.classList.add('dark')
+                } else {
+                  document.documentElement.classList.remove('dark')
+                }
+              } catch (_) {}
+            `,
+          }}
+        />
+      </head>
+      <body className="flex min-h-screen flex-col bg-white pl-[calc(100vw-100%)] text-black antialiased dark:bg-gray-950 dark:text-white">
         <ThemeProviders>
-          {isProduction && <Analytics />}
-          <SectionContainer>
-            <SearchProvider searchConfig={siteMetadata.search as SearchConfig}>
+          {isProduction && (
+            <>
+              <Script src="https://va.vercel-scripts.com/v1/script.js" strategy="lazyOnload" />
+              <Analytics />
+            </>
+          )}
+          <SearchProvider searchConfig={siteMetadata.search as SearchConfig}>
+            <div className="flex flex-grow flex-col">
               <Header />
-              <main className="mb-auto">{children}</main>
-            </SearchProvider>
-            <Footer />
-          </SectionContainer>
+              <main className="flex-grow">
+                <SectionContainer>{children}</SectionContainer>
+              </main>
+              <Footer />
+            </div>
+          </SearchProvider>
         </ThemeProviders>
       </body>
     </html>

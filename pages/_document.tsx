@@ -23,16 +23,30 @@ class MyDocument extends Document {
           <Main />
           <NextScript nonce={nonce} />
           {/* TensorFlow.js scripts with nonce */}
-          <script nonce={nonce} src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs-core" defer />
-          <script
-            nonce={nonce}
-            src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs-backend-webgl"
-            defer
+          <script 
+            nonce={nonce} 
+            src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs-core/dist/tf-core.js"
+            crossOrigin="anonymous"
           />
           <script
             nonce={nonce}
-            src="https://cdn.jsdelivr.net/npm/@tensorflow-models/hand-pose-detection"
-            defer
+            src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs-backend-webgl/dist/tf-backend-webgl.js"
+            crossOrigin="anonymous"
+          />
+          <script
+            nonce={nonce}
+            src="https://cdn.jsdelivr.net/npm/@mediapipe/hands/hands_solution_packed_assets_loader.js"
+            crossOrigin="anonymous"
+          />
+          <script
+            nonce={nonce}
+            src="https://cdn.jsdelivr.net/npm/@mediapipe/hands/hands_solution_simd_wasm_bin.js"
+            crossOrigin="anonymous"
+          />
+          <script
+            nonce={nonce}
+            src="https://cdn.jsdelivr.net/npm/@tensorflow-models/hand-pose-detection/dist/hand-pose-detection.js"
+            crossOrigin="anonymous"
           />
         </body>
       </Html>

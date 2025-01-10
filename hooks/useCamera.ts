@@ -1,4 +1,4 @@
-import { useCallback, useRef } from 'react'
+import { useCallback, useRef, useEffect } from 'react'
 import { FALLBACK_VIDEO_CONSTRAINTS } from '@/constants/handpose'
 import { debug, handleCameraError } from '@/utils/handpose'
 import type { VideoConstraints } from '@/types/handpose'
@@ -15,30 +15,51 @@ import type { VideoConstraints } from '@/types/handpose'
  */
 export const useCamera = () => {
   const videoRef = useRef<HTMLVideoElement>(null)
+  const streamRef = useRef<MediaStream | null>(null)
+
+  const releaseCamera = useCallback(() => {
+    if (streamRef.current) {
+      streamRef.current.getTracks().forEach((track) => {
+        track.stop()
+        streamRef.current?.removeTrack(track)
+      })
+      streamRef.current = null
+    }
+    if (videoRef.current?.srcObject) {
+      videoRef.current.srcObject = null
+    }
+  }, [])
 
   const setupCamera = useCallback(async () => {
     if (!videoRef.current) return false
 
+    // Clean up any existing stream before setting up a new one
+    releaseCamera()
+
     const setupVideoStream = async (constraints: VideoConstraints) => {
-      const stream = await navigator.mediaDevices.getUserMedia(constraints)
+      try {
+        const stream = await navigator.mediaDevices.getUserMedia(constraints)
+        streamRef.current = stream
+        videoRef.current!.srcObject = stream
 
-      // set the video stream as the source object for the video element
-      videoRef.current!.srcObject = stream
+        await new Promise<void>((resolve) => {
+          if (!videoRef.current) return
+          videoRef.current.onloadeddata = () => {
+            debug('Video loaded', {
+              width: videoRef.current?.videoWidth,
+              height: videoRef.current?.videoHeight,
+            })
+            resolve()
+          }
+        })
 
-      await new Promise<void>((resolve) => {
-        if (!videoRef.current) return
-        videoRef.current.onloadeddata = () => {
-          debug('Video loaded', {
-            width: videoRef.current?.videoWidth,
-            height: videoRef.current?.videoHeight,
-          })
-          resolve()
-        }
-      })
-
-      // play the video and wait for .5 second to ensure proper initialization
-      await videoRef.current!.play()
-      await new Promise((resolve) => setTimeout(resolve, 500))
+        await videoRef.current!.play()
+        await new Promise((resolve) => setTimeout(resolve, 500))
+        return true
+      } catch (err) {
+        releaseCamera()
+        throw err
+      }
     }
 
     try {
@@ -49,17 +70,14 @@ export const useCamera = () => {
       const errorMessage = handleCameraError(err)
       throw new Error(errorMessage)
     }
-  }, [])
+  }, [releaseCamera])
 
-  /**
-   * Stops all tracks in the video stream and releases camera resources
-   */
-  const releaseCamera = useCallback(() => {
-    if (videoRef.current?.srcObject) {
-      const stream = videoRef.current.srcObject as MediaStream
-      stream.getTracks().forEach((track) => track.stop())
+  // Ensure cleanup on unmount
+  useEffect(() => {
+    return () => {
+      releaseCamera()
     }
-  }, [])
+  }, [releaseCamera])
 
   return {
     videoRef,

@@ -29,12 +29,29 @@ export function HandposeDetector({ onHandMove, isEnabled }: HandposeDetectorProp
   const { videoRef, setupCamera, releaseCamera } = useCamera()
   const { initializeDetector, detectHands, resetDetector } = useHandDetector()
   const animationFrameRef = useRef<number>()
+  const isInitializedRef = useRef(false)
 
   const [state, setState] = useState<DetectorState>({
     isModelLoaded: false,
     hasRequestedPermission: false,
     error: null,
   })
+
+  // Clean up function to handle all resource cleanup
+  const cleanup = useCallback(() => {
+    if (animationFrameRef.current) {
+      cancelAnimationFrame(animationFrameRef.current)
+      animationFrameRef.current = undefined
+    }
+    resetDetector()
+    releaseCamera()
+    setState({
+      isModelLoaded: false,
+      hasRequestedPermission: false,
+      error: null,
+    })
+    isInitializedRef.current = false
+  }, [resetDetector, releaseCamera])
 
   const processHandData = useCallback(
     async (video: HTMLVideoElement) => {
@@ -78,8 +95,9 @@ export function HandposeDetector({ onHandMove, isEnabled }: HandposeDetectorProp
     }
   }, [isEnabled, processHandData, videoRef])
 
+  // Initialize camera and detector when enabled
   useEffect(() => {
-    if (!isEnabled || state.hasRequestedPermission) return
+    if (!isEnabled || isInitializedRef.current) return
 
     const initialize = async () => {
       if (typeof window !== 'undefined' && !window.isSecureContext) {
@@ -99,15 +117,18 @@ export function HandposeDetector({ onHandMove, isEnabled }: HandposeDetectorProp
         await setupCamera()
         await initializeDetector()
         setState((prev) => ({ ...prev, isModelLoaded: true, hasRequestedPermission: true }))
+        isInitializedRef.current = true
       } catch (err) {
         const errorMessage = err instanceof Error ? err.message : 'Unknown error'
         setState((prev) => ({ ...prev, error: errorMessage }))
+        cleanup()
       }
     }
 
     initialize()
-  }, [isEnabled, state.hasRequestedPermission, setupCamera, initializeDetector])
+  }, [isEnabled, setupCamera, initializeDetector, cleanup])
 
+  // Start/stop detection loop based on state
   useEffect(() => {
     if (!isEnabled || !state.isModelLoaded || !state.hasRequestedPermission) return
 
@@ -116,21 +137,22 @@ export function HandposeDetector({ onHandMove, isEnabled }: HandposeDetectorProp
     return () => {
       if (animationFrameRef.current) {
         cancelAnimationFrame(animationFrameRef.current)
+        animationFrameRef.current = undefined
       }
     }
   }, [isEnabled, state.isModelLoaded, state.hasRequestedPermission, runDetectionLoop])
 
+  // Cleanup when disabled or unmounted
   useEffect(() => {
     if (!isEnabled) {
-      setState({
-        isModelLoaded: false,
-        hasRequestedPermission: false,
-        error: null,
-      })
-      resetDetector()
-      releaseCamera()
+      cleanup()
     }
-  }, [isEnabled, resetDetector, releaseCamera])
+
+    // Cleanup on component unmount
+    return () => {
+      cleanup()
+    }
+  }, [isEnabled, cleanup])
 
   if (!isEnabled) return null
 

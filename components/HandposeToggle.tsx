@@ -8,7 +8,7 @@ interface HandposeToggleProps {
 
 export function HandposeToggle({ isEnabled, onToggle }: HandposeToggleProps) {
   return (
-    <div className="fixed bottom-4 right-4 flex items-center gap-2 rounded-lg bg-white/80 p-2 shadow-lg backdrop-blur-sm dark:bg-gray-800/80">
+    <div className="fixed bottom-4 right-4 hidden items-center gap-2 rounded-lg bg-white/80 p-2 shadow-lg backdrop-blur-sm dark:bg-gray-800/80 sm:flex">
       <Switch
         checked={isEnabled}
         onChange={onToggle}
