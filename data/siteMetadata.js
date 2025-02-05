@@ -3,7 +3,8 @@ const siteMetadata = {
   title: 'Sharky Blog',
   author: 'Kangwei Liao',
   headerTitle: 'Sharky Blog',
-  description: 'A blog created with Next.js and Tailwind.css by Kangwei Liao',
+  description:
+    'A story composed with Next.js and Tailwind.css by Kangwei Liao, a passionate Full-Stack engineer.',
   language: 'en-us',
   theme: 'light', // dark or light
   siteUrl: 'https://tailwind-nextjs-starter-blog.vercel.app',
