@@ -114,8 +114,9 @@ export class DotsService {
   initializeDots(canvasSize: CanvasSize): void {
     this.canvasSize = canvasSize
     const { width, height } = canvasSize
-    const cols = Math.ceil(width / this.config.spacing!)
-    const rows = Math.ceil(height / this.config.spacing!)
+    const spacing = this.config.spacing! * 0.8
+    const cols = Math.ceil(width / spacing)
+    const rows = Math.ceil(height / spacing)
     this.dots = []
 
     const startColor = this.getCurrentStartColor()
@@ -123,8 +124,8 @@ export class DotsService {
 
     for (let i = 0; i < cols; i++) {
       for (let j = 0; j < rows; j++) {
-        const x = i * this.config.spacing!
-        const y = j * this.config.spacing!
+        const x = i * spacing
+        const y = j * spacing
         const xPercent = x / width
         const yPercent = y / height
 
