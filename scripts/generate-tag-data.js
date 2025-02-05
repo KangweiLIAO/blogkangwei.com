@@ -8,8 +8,8 @@ function getAllFiles(dirPath, arrayOfFiles) {
   arrayOfFiles = arrayOfFiles || []
 
   files.forEach((file) => {
-    if (fs.statSync(dirPath + "/" + file).isDirectory()) {
-      arrayOfFiles = getAllFiles(dirPath + "/" + file, arrayOfFiles)
+    if (fs.statSync(dirPath + '/' + file).isDirectory()) {
+      arrayOfFiles = getAllFiles(dirPath + '/' + file, arrayOfFiles)
     } else {
       if (file.endsWith('.mdx') || file.endsWith('.md')) {
         arrayOfFiles.push(path.join(dirPath, file))
@@ -43,4 +43,4 @@ function generateTagData() {
   console.log('Tag data generated successfully!')
 }
 
-generateTagData() 
+generateTagData()

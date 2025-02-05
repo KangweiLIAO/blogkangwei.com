@@ -62,6 +62,7 @@ export function HandposeDetector({ onHandMove, isEnabled }: HandposeDetectorProp
 ```
 
 The component uses several custom hooks and refs to manage its state:
+
 - `useCamera`: Handles webcam setup and cleanup
 - `useHandDetector`: Manages the MediaPipe model initialization and hand detection
 - `animationFrameRef`: Keeps track of the animation frame for smooth rendering
@@ -148,6 +149,7 @@ Now, here comes the fun part (and by fun, I mean the part where I spent hours de
 ### The Problem: Content Security Policy
 
 When trying to load MediaPipe from CDN, I ran into this error:
+
 ```
 Refused to load script from 'https://cdn.jsdelivr.net/npm/@mediapipe/hands' because it violates Content Security Policy
 ```
@@ -170,11 +172,12 @@ Here's how I fixed it:
    ```
 3. **Development vs Production**: Added environment-specific rules to keep development smooth while maintaining production security
 
-## The Results: Wave Your Hands in the Air! 
+## The Results: Wave Your Hands in the Air!
 
 The final result? A blog that responds to your hand movements! The interactive dots in the background follow your hand position, creating a magical effect that makes my blog feel more alive.
 
 Some cool features:
+
 - Real-time hand tracking with minimal latency
 - Smooth coordinate mapping for natural interaction
 - Fallback handling when camera access isn't available
@@ -189,6 +192,6 @@ Some cool features:
 
 ## What's Next?
 
-I'm thinking of adding more gesture controls - maybe a "force push" to navigate between pages? Or a "finger snap" to toggle dark mode? The possibilities are endless! 
+I'm thinking of adding more gesture controls - maybe a "force push" to navigate between pages? Or a "finger snap" to toggle dark mode? The possibilities are endless!
 
-*Note: Your webcam is only accessed with your permission and all processing happens locally in your browser. No video data is ever sent to any server.* 
+_Note: Your webcam is only accessed with your permission and all processing happens locally in your browser. No video data is ever sent to any server._
