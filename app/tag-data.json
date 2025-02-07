@@ -1,18 +1,1 @@
-{
-  "project": 2,
-  "web-development": 1,
-  "machine-learning": 1,
-  "leetcode": 4,
-  "graph": 1,
-  "dfs": 1,
-  "linked-lists": 2,
-  "dynamic-programming": 1,
-  "recursion": 1,
-  "iteration": 1,
-  "complexity": 1,
-  "unity": 1,
-  "game-development": 2,
-  "guide": 2,
-  "unity-engine": 1,
-  "github": 1
-}
+{"project":2,"web-development":1,"machine-learning":1,"leetcode":4,"graph":1,"dfs":1,"linked-lists":2,"dynamic-programming":1,"recursion":1,"iteration":1,"complexity":1,"unity":1,"game-development":2,"guide":2,"unity-engine":1,"github":1}

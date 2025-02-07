@@ -114,7 +114,7 @@ export class DotsService {
   initializeDots(canvasSize: CanvasSize): void {
     this.canvasSize = canvasSize
     const { width, height } = canvasSize
-    const spacing = this.config.spacing! * 0.8
+    const spacing = this.config.spacing! * 0.9
     const cols = Math.ceil(width / spacing)
     const rows = Math.ceil(height / spacing)
     this.dots = []

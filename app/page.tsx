@@ -29,7 +29,7 @@ export default function Home() {
             <div className="flex flex-wrap gap-3 pt-4 sm:gap-4">
               <Button variant="rounded" size="rounded" asChild>
                 <Link
-                  href="https://drive.google.com/file/d/1BvngGIHgbMQxBo4x-v0U_9htVnJ4dlpV/view?usp=sharing"
+                  href="https://drive.google.com/file/d/1NScWKxe_wQrnhq9fLqgXJ8y_aiFSQrPz/view?usp=sharing"
                   className="gap-2"
                 >
                   <FileText className="h-4 w-4" />
