@@ -1,0 +1,76 @@
+---
+title: 'Unlocking Local AI Power: Hosting Open WebUI with LM Studio on Windows Like a Pro'
+date: '2025-2-23'
+tags: ['AI', 'Docker', 'LM-Studio', 'Open WebUI']
+draft: false
+summary: 'Learn how to host Open WebUI with LM Studio on Windows using Docker and connect from local devices effortlessly.'
+---
+
+# Unlocking Local AI Power: Hosting Open WebUI with LM Studio on Windows Like a Pro
+
+Imagine having a powerful AI setup right on your Windows machine, accessible from any device in your home—your laptop, phone, or even a tablet—without relying on cloudy servers or hefty subscriptions. That’s the magic of pairing **Open WebUI** with **LM Studio** and running it locally using Docker. In this guide, I’ll walk you through setting up this slick combo for *local hosting AI*, sharing a hiccup I hit along the way and how I fixed it. Whether you’re a tech enthusiast or just dipping your toes into AI, this step-by-step will get you up and running with confidence.
+
+## Why Host Open WebUI with LM Studio Locally?
+
+Running AI tools locally is a game-changer. With **LM Studio**, you get a sleek interface to manage language models, and **Open WebUI** adds a customizable front-end to interact with them. Hosting them on your Windows machine with Docker keeps everything lightweight, secure, and under your control. Plus, connecting from other devices on your network? That’s the dream for tinkerers like me who want flexibility without the fuss.
+
+Here’s what we’re aiming for:
+- A Dockerized setup of Open WebUI tied to LM Studio.
+- Seamless access from any local device, like your phone or another PC.
+
+## Tools and Setup
+
+To pull this off, you’ll need:
+- **Docker Desktop**: Installed and running on Windows.
+- **LM Studio**: The engine powering your local AI models.
+- **Open WebUI**: The web interface we’ll host via Docker.
+- A basic grasp of your local network (don’t worry, I’ll keep it simple!).
+
+First, install LM Studio on your Windows machine and fire it up. Load your favorite language model—I’m partial to something lightweight yet chatty. Then, grab the Open WebUI Docker image. Here’s the command to get it running:
+
+```bash
+docker run -d -p 3000:8080 --add-host=host.docker.internal:host-gateway -v open-webui:/app/backend/data --name open-webui ghcr.io/open-webui/open-webui:main
+```
+
+This spins up Open WebUI on port 3000. 
+
+Easy, right? But here’s where I stumbled—and you might too.
+
+## The Connection Conundrum (And How I Fixed It)
+Everything was humming along on my Windows host, and Open WebUI loaded perfectly in my browser at localhost:3000. But when I tried connecting from my 
+phone on the same Wi-Fi? Nada. Zilch. The app just stared back at me, refusing to talk to LM Studio.
+
+The problem? LM Studio’s local server defaults to localhost:1234, which works fine on the host machine but doesn’t play nice with other devices. 
+To fix this, I needed to tweak two things:
+
+Enable LM Studio’s Local Server: In LM Studio, head to the settings, find the server options, and ensure it’s running on port 1234.
+Set the API Address to the Host IP: Instead of localhost, use your machine’s local IP (e.g., 192.168.0.100). So, the API address becomes http://192.168.0.100:1234.
+To test this, I opened a terminal and used curl from another device:
+
+```bash
+curl http://192.168.0.100:1234
+```
+
+If it responds, you’re golden! Back in Open WebUI, update the API settings to point to this address, and boom—my phone could now chat with the AI like they were old pals.
+
+## Step-by-Step: Making It Work
+
+Here’s the full rundown:
+1. **Start LM Studio**: Launch it, load a model, and enable the server on port 1234.
+2. **Run Open WebUI in Docker**: Use the Docker command above.
+3. **Find Your Host IP**: On Windows, open a command prompt and type ipconfig. Look for your IPv4 address (e.g., 192.168.0.100).
+4. **Configure Open WebUI**: In the web interface (at `http://localhost:3000` on your host), set the API endpoint to `http://your-ip:1234`.
+5. **Test from Another Device**: Open a browser on your phone or another PC, navigate to `http://your-ip:3000`, and watch the magic happen.
+
+## Troubleshooting Tips
+- **Firewall Blocking Port 1234?** Add an exception in Windows Defender for port 1234 (TCP).
+- **Docker Not Playing Nice?** Ensure Docker Desktop is running and the container isn’t stopped.
+- **Still Stuck?** Double-check your IP and run that curl test again.
+
+## Why This Matters
+This setup isn’t just cool—it’s practical. Hosting Open WebUI and LM Studio locally means no internet dependency, faster responses, and total privacy for your AI experiments. Plus, Docker keeps it portable and clean—no messy installs to clutter your system.
+
+## Conclusion
+Setting up Open WebUI with LM Studio on Windows using Docker is a rewarding way to flex your local hosting AI skills. Sure, I hit a snag with device connectivity, but switching from localhost to my host IP unlocked the full potential of this setup. Now, I can tap into my AI from anywhere in my house—coffee in hand, phone in the other. Give it a shot, tweak it to your liking, and let me know how it goes!
+
+Happy hosting!
