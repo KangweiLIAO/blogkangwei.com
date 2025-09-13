@@ -1,0 +1,136 @@
+---
+title: 'LeetCode 797: All Paths From Source to Target'
+date: '2024-11-23'
+tags: ['leetcode', 'graph', 'dfs']
+draft: false
+summary: 'A deep dive into finding all possible paths in a directed acyclic graph (DAG) using DFS, with insights on graph traversal vs tree traversal.'
+---
+
+# LeetCode 797: All Paths From Source to Target
+
+## Problem Statement
+
+Given a directed acyclic graph (DAG) of `n` nodes labeled from `0` to `n - 1`, find all possible paths from node `0` to node `n - 1` and return them in any order.
+
+The graph is given as follows: `graph[i]` is a list of all nodes you can visit from node `i` (i.e., there is a directed edge from node `i` to node `graph[i][j]`).
+
+## The Solution
+
+Here's my solution using depth-first search (DFS):
+
+```python
+class Solution:
+    def allPathsSourceTarget(self, graph: List[List[int]]) -> List[List[int]]:
+        # Input is an adjacency list
+        result = []
+        target = len(graph) - 1
+        def traverse(src, path):
+            # init_input = (graph, 0, len(graph) - 1, [0], [])
+            path = path + [src]
+            if src == target:
+                result.append(path)
+                return
+            for v in graph[src]:
+                traverse(v, path)
+        traverse(0, [])
+        return result
+```
+
+## Understanding the Solution
+
+### Key Points:
+
+1. The input `graph` is an adjacency list where `graph[i]` contains all nodes that can be reached from node `i`
+2. We use DFS to explore all possible paths from source (0) to target (n-1)
+3. Since it's a DAG (Directed Acyclic Graph), we don't need to track visited nodes
+4. The path is built incrementally as we traverse deeper
+
+### A Common Pitfall: List Operations in Python
+
+During my implementation, I initially made a mistake with list operations. Here's the key difference between `list.extend()` and `list.append()`:
+
+```python
+# Using append
+list1 = [1, 2]
+list1.append([3, 4])  # Result: [1, 2, [3, 4]]
+
+# Using extend
+list2 = [1, 2]
+list2.extend([3, 4])  # Result: [1, 2, 3, 4]
+```
+
+In the context of our solution:
+
+```python
+# Wrong way (if we used extend)
+path.extend([src])  # This would unpack the single number into the list
+
+# Correct way
+path = path + [src]  # Creates a new list with src appended
+# OR
+path.append(src)     # Directly adds src as a single element
+```
+
+## Graph Traversal vs Tree Traversal: A Deep Insight
+
+One of the most interesting aspects of this problem is how it highlights the differences between graph and tree traversal. Here's my perspective:
+
+### The Key Differences
+
+1. **Structure**:
+
+    - Trees are hierarchical with a single path between nodes
+    - Graphs can have multiple paths and cycles
+
+2. **Traversal Approaches**:
+    - Trees: Simple DFS/BFS without cycle detection
+    - Graphs: Need to handle potential cycles
+
+### Node Traversal vs Path Traversal
+
+When working with graphs, we have two distinct traversal scenarios:
+
+1. **Node Traversal**:
+
+    ```python
+    visited = set()  # Marked in pre-order
+    def traverseNodes(node):
+        if node in visited:
+            return
+        visited.add(node)  # Mark in pre-order
+        # Process node
+        for neighbor in graph[node]:
+            traverseNodes(neighbor)
+    ```
+
+2. **Path Traversal** (like in this problem):
+    ```python
+    onPath = set()  # Tracks current path
+    def traversePaths(node):
+        onPath.add(node)      # Mark in pre-order
+        # Process path
+        for neighbor in graph[node]:
+            if neighbor not in onPath:  # Avoid cycles
+                traversePaths(neighbor)
+        onPath.remove(node)   # Unmark in post-order
+    ```
+
+In our solution, since we're working with a DAG, we don't need the `onPath` set, but understanding this concept is crucial for general graph problems.
+
+## Time and Space Complexity
+
+- Time Complexity: O(2^N \* N), where N is the number of nodes
+    - In worst case, we might have 2^N possible paths
+    - Each path can be up to length N
+- Space Complexity: O(N)
+    - The recursion stack can go up to depth N
+    - We store paths of length N
+
+## Key Takeaways
+
+1. When dealing with graphs, always consider whether you need cycle detection
+2. In Python, be careful with list operations (`append` vs `extend`)
+3. DAGs simplify traversal as we don't need to track visited nodes
+4. Path-finding problems often require different handling than simple node traversal
+
+Remember: Graph traversal is like exploring a city with multiple routes, while tree traversal is like following a family tree - one path down, one path up!

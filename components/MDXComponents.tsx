@@ -7,10 +7,10 @@ import CustomLink from './Link'
 import TableWrapper from './TableWrapper'
 
 export const components: MDXComponents = {
-  Image,
-  TOCInline,
-  a: CustomLink,
-  pre: Pre,
-  table: TableWrapper,
-  BlogNewsletterForm,
+    Image,
+    TOCInline,
+    a: CustomLink,
+    pre: Pre,
+    table: TableWrapper,
+    BlogNewsletterForm,
 }

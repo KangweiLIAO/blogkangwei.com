@@ -1,0 +1,154 @@
+---
+title: LeetCode 160 - Intersection of Two Linked-List
+date: '2024-07-15'
+tags: ['leetcode', 'recursion', 'iteration', 'linked lists', 'complexity']
+draft: false
+summary: My solution to the LeetCode problem 160 and discussion on recursion and iteration.
+---
+
+I want to dive into choosing between recursion and iteration. The problem here is to find the intersection node of two singly linked lists. Let’s first review two solutions—one using recursion and the other using iteration.
+
+## Problem Definition
+
+We are given two singly-linked lists, and need to determine if they intersect at some node. If they do, we return that node; otherwise, we return `None`.
+
+```python
+# Definition for singly-linked list.
+# class ListNode:
+#     def __init__(self, x):
+#         self.val = x
+#         self.next = None
+```
+
+## Solution 1: Recursive Approach
+
+The recursive approach works by first finding the lengths of both linked lists and then recursively aligning them and comparing nodes until the intersection is found or the end of the lists is reached.
+
+```python
+class Solution1:
+    def getIntersectionNode(self, headA: ListNode, headB: ListNode) -> Optional[ListNode]:
+        # function to traverse to the end of the list, return the length
+        def get_len(head: ListNode) -> int:
+            if not head:
+                return 0
+            return 1 + get_len(head.next)
+
+        # compare nodes from the end
+        def helper(headA: ListNode, headB: ListNode, lenA: int, lenB: int) -> Optional[ListNode]:
+            # align the lists by moving the pointer in the longer list
+            if lenA > lenB:
+                return helper(headA.next, headB, lenA - 1, lenB)
+            elif lenB > lenA:
+                return helper(headA, headB.next, lenA, lenB - 1)
+
+            # both lists are aligned in length from now on:
+            if not headA or not headB:
+                return None
+
+            if headA is headB:
+                return headA
+
+            # recursively check the next nodes
+            return helper(headA.next, headB.next, lenA - 1, lenB - 1)
+
+        # get the lengths of both lists
+        lenA = get_len(headA)
+        lenB = get_len(headB)
+        return helper(headA, headB, lenA, lenB) # start recursion
+```
+
+## Solution 2: Recursive Pointer Switching Approach
+
+This second recursive approach avoids calculating the lengths of the lists. Instead, it switches the pointers when reaching the end of each list to eliminate the difference in list lengths.
+
+```python
+class Solution2:
+    def getIntersectionNode(
+        self, headA: ListNode, headB: ListNode
+    ) -> Optional[ListNode]:
+        def helper(ptrA: ListNode, ptrB: ListNode) -> Optional[ListNode]:
+            # no intersection
+            if ptrA is None and ptrB is None:
+                return None
+
+            # intersection
+            if ptrA is ptrB:
+                return ptrA
+
+            # move both pointers, reset them to the other list's head,
+            # if they reach the end to eliminate the difference
+            if ptrA is None:
+                ptrA = headB
+            else:
+                ptrA = ptrA.next
+
+            if ptrB is None:
+                ptrB = headA
+            else:
+                ptrB = ptrB.next
+
+            return helper(ptrA, ptrB)
+
+        return helper(headA, headB)  # start recursion
+```
+
+## Solution 3: Iterative Approach
+
+The key idea is to swap the pointers to the head of the other list once they reach the end of their own list.
+This way, both pointers traverse the same total number of nodes by the time they reach the intersection (or both hit None if
+there is no intersection).
+
+```python
+class Solution:
+    def getIntersectionNode(self, headA: ListNode, headB: ListNode) -> ListNode:
+        if not headA or not headB:
+            return None
+
+        # initialize two pointers
+        pA, pB = headA, headB
+
+        # traverse the two lists
+        while pA != pB:
+            # Move pointer A to headB when it reaches the end of list A, otherwise move to next node
+            pA = pA.next if pA else headB
+            # Move pointer B to headA when it reaches the end of list B, otherwise move to next node
+            pB = pB.next if pB else headA
+
+        # either both are None or both will be at the intersection node
+        return pA
+```
+
+## Iteration vs Recursion
+
+Let’s now examine why iteration would be more efficient for this type of problem, despite recursion providing a clean, elegant solution.
+
+### Factors to Consider:
+
+1. **Input Length and Call Stack Size:**
+    - In recursive solutions, each recursive call adds a new frame to the call stack, which can result in high memory consumption, especially with long linked lists.
+    - For very large lists, the call stack could overflow due to the deep recursion required to traverse these lists.
+2. **Space Complexity:**
+    - The space complexity for recursion is higher due to the memory used by the call stack.
+    - The recursive approach requires O(n+m) space, where `n` and `m` are the lengths of the two lists. Each recursive call adds a frame to the call stack, and each frame maintains pointers to the nodes in both lists.
+    - In contrast, an iterative approach would use O(1) space, maintaining only two pointers, one for each list.
+
+## When to Choose Recursion Over Iteration?
+
+### Recursion is Ideal for:
+
+- **Divide and Conquer:** Problems that can be broken down into smaller subproblems that are solved independently.
+- **Tree-Based Problems:** Recursion simplifies tree traversal (like in-order, pre-order, post-order traversal) because each recursive call naturally corresponds to branching structures.
+- **Dynamic Programming:** When solving overlapping subproblems by breaking them down recursively.
+- **Backtracking:** Problems like permutations, combinations, or pathfinding (e.g., the N-Queens problem) are often easier to conceptualize recursively.
+
+### Iteration is Better for:
+
+- **Linear Traversals:** Problems where you need to simply walk through data (like a linked list) are best solved iteratively.
+- **State Updates:** Problems that require updating states or accumulating results (like summing numbers in an array or checking conditions in a loop) benefit from the efficiency of iteration.
+- **Memory Efficiency:** For problems that need to be solved for very large datasets where memory consumption is a concern, an iterative approach will usually be more efficient due to its constant space usage.
+
+## Conclusion
+
+In this problem, despite the recursion solutions being elegant, using recursion is not ideal due to the large memory overhead associated with traversing long linked lists. An iterative solution would provide the same result with better space efficiency.
+
+Whether you choose recursion or iteration depends on the type of problem you’re solving and the trade-offs you’re willing to make between code clarity and performance. Keep in mind the constraints of your system and problem size to make the right choice!

@@ -1,0 +1,76 @@
+---
+title: LeetCode 1130 - Minimum Cost Tree From Leaf Values
+date: '2024-08-27'
+tags: ['leetcode', 'dynamic programming']
+draft: false
+summary: My solution to the LeetCode problem 1130, using dynamic programming.
+---
+
+My solution to the LeetCode problem 1130 - Minimum Cost Tree From Leaf Values. This problem touches on topics like Dynamic Programming (DP), Greedy algorithms, and Mono Structures. Below is an approach and solution to tackle the problem efficiently.
+
+---
+
+## Problem Overview
+
+The problem requires us to construct a binary tree where each leaf node has a value from a given array. The task is to minimize the cost of building the tree. The cost of the tree is the sum of the product of the values of the two leaves used to create each non-leaf node.
+
+### Problem Constraints:
+
+1. The array contains integers greater than zero.
+2. We are asked to minimize the sum product of leaves as we build the tree.
+
+---
+
+## Solution: Greedy Approach with Mono Struct
+
+### Key Concepts:
+
+1. **Greedy Technique**: At each step, remove the smallest leaf to minimize the immediate cost.
+2. **Mono Struct**: A structure that maintains the values in a particular order to help optimize our approach.
+
+The following solution provided by me illustrates the greedy technique to solve this problem.
+
+```cpp
+class Solution {
+public:
+    int mctFromLeafValues(vector<int>& arr) {
+        int result = 0;
+        stack<int> s;
+        s.push(INT_MAX);  // add a large value to compare
+
+        for (int value : arr) {
+            while (s.top() <= value) {
+                int mid = s.top();
+                s.pop();
+                result += mid * min(s.top(), value);  // multiply by the smaller of the two neighbors
+            }
+            s.push(value);
+        }
+
+        while (s.size() > 2) {  // clean up the remaining elements in the stack
+            int mid = s.top();
+            s.pop();
+            result += mid * s.top();
+        }
+
+        return result;
+    }
+};
+```
+
+### Explanation of Solution
+
+1. **Loop Until One Element Left**: The goal is to keep reducing the array size by combining the two smallest values.
+2. **Find the Minimum**: At each step, find the index of the smallest element in the array.
+3. **Combine Adjacent Elements**: Calculate the cost by multiplying the smallest element with its adjacent element.
+4. **Remove the Smallest Element**: After combining, remove the smallest element from the array to reduce the size, and repeat the process.
+5. **Return the Result**: Once only one element remains, return the accumulated result.
+6. **Time complexity**: The time complexity is O(n) because each element is pushed and popped from the stack at most once.
+
+---
+
+## Conclusion
+
+This approach demonstrates how a greedy algorithm can efficiently solve a problem like the **Minimum Cost Tree from Leaf Values**. By iteratively removing the smallest element and combining it with its neighbor, we are able to minimize the overall cost of building the binary tree. Mono structures help maintain order in such problems to optimize the approach further.
+
+If you're interested in further optimizing or exploring dynamic programming alternatives, feel free to dive deeper into variations of this problem!

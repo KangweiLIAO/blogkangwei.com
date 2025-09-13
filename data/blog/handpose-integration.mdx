@@ -1,0 +1,197 @@
+---
+title: 'Wave to interact - The Handpose Magic'
+date: '2025-1-13'
+tags: ['project', 'web-development', 'machine-learning']
+draft: false
+summary: 'A fun journey of integrating MediaPipe hand detection into a Next.js blog, complete with security hurdles and creative solutions.'
+---
+
+# Adding Handpose Magic to My Blog: MediaPipe and Next.js
+
+Ever thought your blog was too... static? Well, I did! So I decided to spice things up by adding handpose detection to my blog. Now you can wave your hands around like a wizard to interact with the background of my blog's home page! 🧙‍♂️
+
+## A Blend of Modern Web Magic
+
+This feature combines several cutting-edge technologies to create a seamless hand detection experience:
+
+- **Next.js 14+**: The foundation of my blog, providing server-side rendering and optimal performance
+- **MediaPipe**: Google's ML toolkit that turns your webcam feed into hand coordinate data
+- **TensorFlow.js**: The engine under the hood, processing hand detection models in real-time
+- **React**: Managing my component state and keeping everything nicely organized
+
+## How It All Works: The Behind-the-Scenes Story
+
+The hand detection system is built around three main components:
+
+1. **Camera Access**: A custom `useCamera` hook manages webcam permissions and video feed
+2. **Hand Detection**: The `useHandDetector` hook initializes MediaPipe models and processes frames
+3. **Coordinate Mapping**: Transforms detected hand positions into window coordinates for interaction
+
+Here's a sneak peek at how I process hand data:
+
+```typescript
+const processHandData = async (video: HTMLVideoElement) => {
+    const hand = await detectHands(video)
+    if (!hand || !validateHandData(hand)) return
+
+    const handPoints = hand.keypoints.map((keypoint) => {
+        const { windowX, windowY } = calculateWindowCoordinates(keypoint, video)
+        return { x: windowX, y: windowY }
+    })
+
+    onHandMove(handPoints)
+}
+```
+
+### The HandposeDetector Component: A Deep Dive
+
+The real magic happens in the `HandposeDetector` component. It's a client-side React component that manages the entire hand detection lifecycle. Here's how it works:
+
+```typescript
+export function HandposeDetector({ onHandMove, isEnabled }: HandposeDetectorProps) {
+  const { videoRef, setupCamera, releaseCamera } = useCamera()
+  const { initializeDetector, detectHands, resetDetector } = useHandDetector()
+  const animationFrameRef = useRef<number>()
+  const isInitializedRef = useRef(false)
+
+  const [state, setState] = useState<DetectorState>({
+    isModelLoaded: false,
+    hasRequestedPermission: false,
+    error: null,
+  })
+```
+
+The component uses several custom hooks and refs to manage its state:
+
+- `useCamera`: Handles webcam setup and cleanup
+- `useHandDetector`: Manages the MediaPipe model initialization and hand detection
+- `animationFrameRef`: Keeps track of the animation frame for smooth rendering
+- `isInitializedRef`: Prevents redundant initialization
+
+#### Smart Resource Management
+
+One cool thing I implemented is automatic cleanup of resources. The component handles everything from camera permissions to model initialization, and cleans up after itself:
+
+```typescript
+const cleanup = useCallback(() => {
+    if (animationFrameRef.current) {
+        cancelAnimationFrame(animationFrameRef.current)
+        animationFrameRef.current = undefined
+    }
+    resetDetector()
+    releaseCamera()
+    setState({
+        isModelLoaded: false,
+        hasRequestedPermission: false,
+        error: null,
+    })
+    isInitializedRef.current = false
+}, [resetDetector, releaseCamera])
+```
+
+#### The Detection Loop
+
+The continuous detection loop is where performance really matters. I implemented it using `requestAnimationFrame` for smooth updates:
+
+```typescript
+const runDetectionLoop = useCallback(async () => {
+    if (!videoRef.current || !isVideoReady(videoRef.current)) return
+
+    await processHandData(videoRef.current)
+    if (isEnabled) {
+        animationFrameRef.current = requestAnimationFrame(runDetectionLoop)
+    }
+}, [isEnabled, processHandData, videoRef])
+```
+
+#### Handling Edge Cases
+
+The component also includes robust error handling and fallbacks:
+
+```typescript
+if (typeof window !== 'undefined' && !window.isSecureContext) {
+    setState((prev) => ({
+        ...prev,
+        error: 'Hand pose detection requires a secure context (HTTPS or localhost)',
+    }))
+    return
+}
+
+if (!navigator.mediaDevices?.getUserMedia) {
+    setState((prev) => ({ ...prev, error: 'Your browser does not support camera access' }))
+    return
+}
+```
+
+#### The Final Touch: Invisible Video Element
+
+The component renders an invisible video element that streams the webcam feed:
+
+```typescript
+return (
+  <video
+    ref={videoRef}
+    className="pointer-events-none fixed -z-10 h-0 w-0 select-none"
+    playsInline
+    style={{ opacity: 0 }}
+  >
+    <track kind="captions" src="" label="English" default />
+  </video>
+)
+```
+
+This setup ensures that the video feed is processed without being visible to users, maintaining a clean UI while still enabling hand detection.
+
+## The Security Saga: When CSP Meets External Scripts
+
+Now, here comes the fun part (and by fun, I mean the part where I spent hours debugging 😅). Modern web security is like that overprotective parent who won't let you play with strangers - in this case, external scripts.
+
+### The Problem: Content Security Policy
+
+When trying to load MediaPipe from CDN, I ran into this error:
+
+```
+Refused to load script from 'https://cdn.jsdelivr.net/npm/@mediapipe/hands' because it violates Content Security Policy
+```
+
+### Solution:
+
+Here's how I fixed it:
+
+1. **Middleware**: Created a custom Next.js middleware to handle CSP
+2. **Strategic CSP Configuration**: Added specific directives for MediaPipe:
+    ```typescript
+    const cspHeader = [
+        // Allow MediaPipe and TensorFlow scripts
+        `script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.jsdelivr.net`,
+        // Allow WebAssembly for ML models
+        "worker-src 'self' blob: 'unsafe-eval' https://cdn.jsdelivr.net",
+        // Allow camera access
+        "media-src 'self' blob: data: mediastream:",
+    ]
+    ```
+3. **Development vs Production**: Added environment-specific rules to keep development smooth while maintaining production security
+
+## The Results: Wave Your Hands in the Air!
+
+The final result? A blog that responds to your hand movements! The interactive dots in the background follow your hand position, creating a magical effect that makes my blog feel more alive.
+
+Some cool features:
+
+- Real-time hand tracking with minimal latency
+- Smooth coordinate mapping for natural interaction
+- Fallback handling when camera access isn't available
+- Performance optimizations to keep things running smoothly
+
+## Lessons Learned
+
+1. **Security First**: Modern web security requires careful consideration of CSP rules
+2. **Performance Matters**: Hand detection needs optimization to run smoothly
+3. **User Experience**: Always provide fallbacks when features aren't available
+4. **Have Fun**: Sometimes the best projects come from asking "wouldn't it be cool if..."
+
+## What's Next?
+
+I'm thinking of adding more gesture controls - maybe a "force push" to navigate between pages? Or a "finger snap" to toggle dark mode? The possibilities are endless!
+
+_Note: Your webcam is only accessed with your permission and all processing happens locally in your browser. No video data is ever sent to any server._

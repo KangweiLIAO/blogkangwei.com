@@ -1,27 +1,25 @@
 interface Project {
-  title: string
-  description: string
-  href?: string
-  imgSrc?: string
+    title: string
+    description: string
+    href?: string
+    imgSrc?: string
 }
 
 const projectsData: Project[] = [
-  {
-    title: 'A Search Engine',
-    description: `What if you could look up any information in the world? Webpages, images, videos
-    and more. Google has many features to help you find exactly what you're looking
-    for.`,
-    imgSrc: '/static/images/google.png',
-    href: 'https://www.google.com',
-  },
-  {
-    title: 'The Time Machine',
-    description: `Imagine being able to travel back in time or to the future. Simple turn the knob
-    to the desired date and press "Go". No more worrying about lost keys or
-    forgotten headphones with this simple yet affordable solution.`,
-    imgSrc: '/static/images/time-machine.jpg',
-    href: '/blog/the-time-machine',
-  },
+    {
+        title: 'sCode Chatbot',
+        description: `An AI-powered chatbot designed to assist developers with coding tasks by providing code snippets, debugging tips, and programming explanations. 
+    Built with NextJS, FastAPI, and Dialogflow, it offers a seamless experience through deployments on Heroku and Vercel.`,
+        imgSrc: '/static/images/scode.png',
+        href: 'https://github.com/KangweiLIAO/sCode-chatbot',
+    },
+    {
+        title: 'Flow Dataset',
+        description: `The Flow Dataset project leveraging the Kubric framework, this project improves how dynamic, multi-object 
+    scenes are generated for optical flow algorithms, making significant advancements in simulating complex, realistic environments.`,
+        imgSrc: '/static/images/banner.png',
+        href: '/blog/flow-dataset',
+    },
 ]
 
 export default projectsData

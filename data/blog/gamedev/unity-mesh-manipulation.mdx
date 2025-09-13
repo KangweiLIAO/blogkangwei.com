@@ -1,0 +1,78 @@
+---
+title: Mesh Manipulation in Unity - SharedMesh and Combining Meshes
+date: '2023-11-21'
+tags: ['unity engine', 'game development']
+draft: false
+summary: A detailed explanation of mesh manipulation in Unity using SharedMesh and how to solve issues with combining meshes.
+---
+
+In this post, we explore Unity’s `SharedMesh` property, mesh manipulation, and how to address common problems when combining meshes in Unity. This guide is especially useful for developers who are working with GameObjects and want to understand how mesh data is handled in the Unity engine.
+
+## Mesh and SharedMesh
+
+The `Mesh` property in Unity applies to the specific instance of the mesh that has been created for a given object. However, when you use the `SharedMesh` property, it refers to the actual mesh asset itself. This means that any changes made to the shared mesh will affect all GameObjects that use the same mesh reference.
+
+For example:
+
+- **`Mesh`**: Changes apply only to the instance of the mesh on the current GameObject.
+- **`SharedMesh`**: Changes affect all GameObjects sharing the same mesh asset.
+
+<aside>
+    ⚠️ **Tip**: It is recommended to use `SharedMesh` primarily for **reading mesh data** and avoid
+    using it to write or modify mesh data to prevent unintentional changes across multiple objects.
+</aside>
+
+You can refer to Unity's documentation for more details: [MeshFilter.sharedMesh](https://docs.unity3d.com/ScriptReference/MeshFilter-sharedMesh.html)
+
+---
+
+## Combining Meshes in Unity
+
+Unity provides a method called `Mesh.CombineMeshes` that allows you to combine multiple meshes into a single mesh. This can be extremely useful when optimizing performance by reducing the number of draw calls.
+
+```csharp
+MeshFilter[] meshFilters = GetComponentsInChildren<MeshFilter>();
+CombineInstance[] combine = new CombineInstance[meshFilters.Length];
+int i = 0;
+while (i < meshFilters.Length)
+{
+    combine[i].mesh = meshFilters[i].sharedMesh;
+    combine[i].transform = meshFilters[i].transform.localToWorldMatrix;
+    meshFilters[i].gameObject.SetActive(false);
+    i++;
+}
+
+Mesh finalMesh = new Mesh();
+finalMesh.CombineMeshes(combine);
+gameObject.AddComponent<MeshFilter>().mesh = finalMesh;
+gameObject.SetActive(true);
+```
+
+---
+
+### Problem: Number of Vertices Exceeds the Maximum Supported
+
+When combining meshes, you might encounter an error that the number of vertices exceeds the maximum supported vertex count. For example:
+
+> **ArgumentException**: The number of vertices in the combined mesh (421496) exceeds the maximum supported vertex count (65535) of the UInt16 index format. Consider using the UInt32 `IndexFormat` for the combined mesh to increase the supported vertex count.
+
+#### Solution: Use `UInt32` Index Format
+
+By default, Unity uses a 16-bit index buffer, which limits the number of vertices in a mesh to 65,535. However, if you need more vertices, you can switch to a 32-bit index buffer by modifying the `IndexFormat` of the mesh. Here's how to resolve the issue:
+
+```csharp
+Mesh finalMesh = new Mesh();
+finalMesh.indexFormat = UnityEngine.Rendering.IndexFormat.UInt32;  // Use UInt32 format for larger meshes
+finalMesh.CombineMeshes(combine);
+gameObject.GetComponent<MeshFilter>().mesh = finalMesh;
+```
+
+By changing the `indexFormat` to `UInt32`, you can now combine meshes with more than 65,535 vertices.
+
+You can refer to Unity’s documentation for `Mesh.CombineMeshes` here: [Mesh.CombineMeshes](https://docs.unity3d.com/ScriptReference/Mesh.CombineMeshes.html)
+
+---
+
+## Conclusion
+
+Understanding the difference between `Mesh` and `SharedMesh` is crucial for optimizing and managing mesh data efficiently in Unity. Additionally, when combining meshes, it’s essential to be aware of the vertex count limits and how to overcome them by using the `UInt32` index format. With these tools, you can manipulate and combine meshes effectively for better performance in your Unity projects.

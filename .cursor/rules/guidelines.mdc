@@ -1,0 +1,17 @@
+---
+description:
+globs:
+alwaysApply: true
+---
+You should always keep in mind the following conventions when implementing
+- Use **TypeScript strict mode** (`"strict": true`) and type all function parameters, return types, and props.
+- Follow **ESLint + Prettier** rules with `"semi": false`, `"singleQuote": true`, and consistent import ordering (absolute before relative).
+- Organize code into clear layers:
+  - `app/` → route entry points
+  - `components/` → reusable UI pieces (one component per file, PascalCase names)
+  - `layouts/` → page-level wrappers
+- Keep React components **pure and presentational**: no side effects in render; fetch data in `server` components or hooks.
+- Prefer **server components** by default; use client components (`'use client'`) only when interactivity/state is needed.
+- Write **self-documenting code**: meaningful names, no magic numbers, minimal comments except for non-obvious logic.
+- Keep blog content in **MDX** with frontmatter fields: `title`, `date`, `summary`, `tags`, `images`.
+- Enforce **a11y & SEO best practices**: semantic HTML, `alt` on images, `aria-*` on interactive elements, unique `<title>`/`<meta>` per page.
